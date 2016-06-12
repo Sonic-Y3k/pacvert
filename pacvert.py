@@ -177,7 +177,6 @@ def main():
     #else:
     #    http_port = int(pacvert.CONFIG.HTTP_PORT)
 
-    logger.warn("test234");
     # Wait endlessy for a signal to happen
     while True:
         if not pacvert.SIGNAL:
