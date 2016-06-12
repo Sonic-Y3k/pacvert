@@ -36,6 +36,14 @@ def bool_int(value):
 FILENAME = "config.ini"
 
 _CONFIG_DEFINITIONS = {
+    'CHECK_GITHUB': (int, 'General', 1),
+    'CHECK_GITHUB_INTERVAL': (int, 'General', 360),
+    'CHECK_GITHUB_ON_STARTUP': (int, 'General', 1),
+    'DO_NOT_OVERRIDE_GIT_BRANCH': (int, 'General', 0),
+    'GIT_BRANCH': (str, 'General', 'master'),
+    'GIT_PATH': (str, 'General', ''),
+    'GIT_TOKEN': (str, 'General', ''),
+    'GIT_USER': (str, 'General', 'Sonic-Y3k'),
     'LOG_BLACKLIST': (int, 'General', 1),
     'LOG_DIR': (str, 'General', ''),
 }

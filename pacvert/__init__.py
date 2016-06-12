@@ -21,7 +21,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 import config
 #import database
 import logger
-#import versioncheck
+import versioncheck
 import pacvert.config
 
 PROG_DIR = None
@@ -143,7 +143,7 @@ def initialize(config_file):
 
         # Get the currently installed version. Returns None, 'win32' or the git
         # hash.
-        #CURRENT_VERSION, CONFIG.GIT_BRANCH = versioncheck.getVersion()
+        CURRENT_VERSION, CONFIG.GIT_BRANCH = versioncheck.getVersion()
 
         # Write current version to a file, so we know which version did work.
         # This allowes one to restore to that version. The idea is that if we
@@ -159,14 +159,14 @@ def initialize(config_file):
                              (version_lock_file, e))
 
         # Check for new versions
-        #if CONFIG.CHECK_GITHUB_ON_STARTUP and CONFIG.CHECK_GITHUB:
-        #    try:
-        #        LATEST_VERSION = versioncheck.checkGithub()
-        #    except:
-        #        logger.exception("Unhandled exception")
-        #        LATEST_VERSION = CURRENT_VERSION
-        #else:
-        #    LATEST_VERSION = CURRENT_VERSION
+        if CONFIG.CHECK_GITHUB_ON_STARTUP and CONFIG.CHECK_GITHUB:
+            try:
+                LATEST_VERSION = versioncheck.checkGithub()
+            except:
+                logger.exception("Unhandled exception")
+                LATEST_VERSION = CURRENT_VERSION
+        else:
+            LATEST_VERSION = CURRENT_VERSION
 
         # Store the original umask
         UMASK = os.umask(0)
