@@ -1,17 +1,4 @@
-﻿#  This file is part of PlexPy.
-#
-#  PlexPy is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#
-#  PlexPy is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with PlexPy.  If not, see <http://www.gnu.org/licenses/>.
+﻿#  This file is part of Pacvert.
 
 import base64
 import datetime
@@ -258,7 +245,7 @@ def replace_all(text, dic, normalize=False):
                 else:
                     j = unicodedata.normalize('NFC', j)
             except TypeError:
-                j = unicodedata.normalize('NFC', j.decode(plexpy.SYS_ENCODING, 'replace'))
+                j = unicodedata.normalize('NFC', j.decode(pacvert.SYS_ENCODING, 'replace'))
         text = text.replace(i, j)
     return text
 
@@ -355,14 +342,14 @@ def create_https_certificates(ssl_cert, ssl_key):
     from certgen import createKeyPair, createSelfSignedCertificate, TYPE_RSA
 
     serial = int(time.time())
-    domains = ['DNS:' + d.strip() for d in plexpy.CONFIG.HTTPS_DOMAIN.split(',') if d]
-    ips = ['IP:' + d.strip() for d in plexpy.CONFIG.HTTPS_IP.split(',') if d]
+    domains = ['DNS:' + d.strip() for d in pacvert.CONFIG.HTTPS_DOMAIN.split(',') if d]
+    ips = ['IP:' + d.strip() for d in pacvert.CONFIG.HTTPS_IP.split(',') if d]
     altNames = ','.join(domains + ips)
 
-    # Create the self-signed PlexPy certificate
+    # Create the self-signed Pacvert certificate
     logger.debug(u"Generating self-signed SSL certificate.")
     pkey = createKeyPair(TYPE_RSA, 2048)
-    cert = createSelfSignedCertificate(("PlexPy", pkey), serial, (0, 60 * 60 * 24 * 365 * 10), altNames) # ten years
+    cert = createSelfSignedCertificate(("Pacvert", pkey), serial, (0, 60 * 60 * 24 * 365 * 10), altNames) # ten years
 
     # Save the key and certificate to disk
     try:
@@ -484,19 +471,19 @@ def anon_url(*url):
     """
     Return a URL string consisting of the Anonymous redirect URL and an arbitrary number of values appended.
     """
-    return '' if None in url else '%s%s' % (plexpy.CONFIG.ANON_REDIRECT, ''.join(str(s) for s in url))
+    return '' if None in url else '%s%s' % (pacvert.CONFIG.ANON_REDIRECT, ''.join(str(s) for s in url))
 
 def uploadToImgur(imgPath, imgTitle=''):
     """ Uploads an image to Imgur """
-    client_id = plexpy.CONFIG.IMGUR_CLIENT_ID
+    client_id = pacvert.CONFIG.IMGUR_CLIENT_ID
     img_url = ''
 
     if not client_id:
-        #logger.error(u"PlexPy Helpers :: Cannot upload poster to Imgur. No Imgur client id specified in the settings.")
+        #logger.error(u"Pacvert Helpers :: Cannot upload poster to Imgur. No Imgur client id specified in the settings.")
         #return img_url
         # Fallback to shared client id for now. This will be remove in a future update.
-        logger.warn(u"PlexPy Helpers :: No Imgur client id specified in the settings. Falling back to the shared client id.")
-        logger.warn(u"***** The shared Imgur client id will be removed in a future PlexPy update! "
+        logger.warn(u"Pacvert Helpers :: No Imgur client id specified in the settings. Falling back to the shared client id.")
+        logger.warn(u"***** The shared Imgur client id will be removed in a future Pacvert update! "
                     "Please enter your own client id in the settings to continue uploading posters! *****")
         client_id = '743b1a443ccd2b0'
 
@@ -504,7 +491,7 @@ def uploadToImgur(imgPath, imgTitle=''):
         with open(imgPath, 'rb') as imgFile:
             img = imgFile.read()
     except IOError as e:
-        logger.error(u"PlexPy Helpers :: Unable to read image file for Imgur: %s" % e)
+        logger.error(u"Pacvert Helpers :: Unable to read image file for Imgur: %s" % e)
         return img_url
 
     headers = {'Authorization': 'Client-ID %s' % client_id}
@@ -521,14 +508,14 @@ def uploadToImgur(imgPath, imgTitle=''):
     
         if response.get('status') == 200:
             t = '\'' + imgTitle + '\' ' if imgTitle else ''
-            logger.debug(u"PlexPy Helpers :: Image %suploaded to Imgur." % t)
+            logger.debug(u"Pacvert Helpers :: Image %suploaded to Imgur." % t)
             img_url = response.get('data').get('link', '')
         elif response.get('status') >= 400 and response.get('status') < 500:
-            logger.warn(u"PlexPy Helpers :: Unable to upload image to Imgur: %s" % response.reason)
+            logger.warn(u"Pacvert Helpers :: Unable to upload image to Imgur: %s" % response.reason)
         else:
-            logger.warn(u"PlexPy Helpers :: Unable to upload image to Imgur.")
+            logger.warn(u"Pacvert Helpers :: Unable to upload image to Imgur.")
     except (urllib2.HTTPError, urllib2.URLError) as e:
-            logger.warn(u"PlexPy Helpers :: Unable to upload image to Imgur: %s" % e)
+            logger.warn(u"Pacvert Helpers :: Unable to upload image to Imgur: %s" % e)
 
     return img_url
 
@@ -538,9 +525,9 @@ def cache_image(url, image=None):
     If no image is provided, tries to return the image from the cache directory.
     """
     # Create image directory if it doesn't exist
-    imgdir = os.path.join(plexpy.CONFIG.CACHE_DIR, 'images/')
+    imgdir = os.path.join(pacvert.CONFIG.CACHE_DIR, 'images/')
     if not os.path.exists(imgdir):
-        logger.debug(u"PlexPy Helpers :: Creating image cache directory at %s" % imgdir)
+        logger.debug(u"Pacvert Helpers :: Creating image cache directory at %s" % imgdir)
         os.makedirs(imgdir)
 
     # Create a hash of the url to use as the filename
@@ -553,7 +540,7 @@ def cache_image(url, image=None):
             with open(imagefile, 'wb') as cache_file:
                 cache_file.write(image)
         except IOError as e:
-            logger.error(u"PlexPy Helpers :: Failed to cache image %s: %s" % (imagefile, e))
+            logger.error(u"Pacvert Helpers :: Failed to cache image %s: %s" % (imagefile, e))
 
     # Try to return the image from the cache directory
     if os.path.isfile(imagefile):
