@@ -179,8 +179,53 @@ def start():
     global started
 
     if _INITIALIZED:
+        initialize_scheduler()
         started = True
 
+
+def initialize_scheduler():
+    """
+    Start the scheduled background tasks. Re-schedule if interval settings changed.
+    """
+
+    with SCHED_LOCK:
+        # Check if scheduler should be started
+        start_jobs = not len(SCHED.get_jobs())
+
+        # Update check
+        if CONFIG.CHECK_GITHUB_INTERVAL and CONFIG.CHECK_GITHUB:
+            minutes = CONFIG.CHECK_GITHUB_INTERVAL
+        else:
+            minutes = 0
+        schedule_job(versioncheck.checkGithub, 'Check GitHub for updates', hours=0, minutes=minutes)
+
+        # Start scheduler
+        if start_jobs and len(SCHED.get_jobs()):
+            try:
+                SCHED.start()
+            except Exception as e:
+                logger.info(e)
+
+def schedule_job(function, name, hours=0, minutes=0, seconds=0, args=None):
+    """
+    Start scheduled job if starting or restarting plexpy.
+    Reschedule job if Interval Settings have changed.
+    Remove job if if Interval Settings changed to 0
+    """
+
+    job = SCHED.get_job(name)
+    if job:
+        if hours == 0 and minutes == 0 and seconds == 0:
+            SCHED.remove_job(name)
+            logger.info("Removed background task: %s", name)
+        elif job.trigger.interval != datetime.timedelta(hours=hours, minutes=minutes):
+            SCHED.reschedule_job(name, trigger=IntervalTrigger(
+                hours=hours, minutes=minutes, seconds=seconds), args=args)
+            logger.info("Re-scheduled background task: %s", name)
+    elif hours > 0 or minutes > 0 or seconds > 0:
+        SCHED.add_job(function, id=name, trigger=IntervalTrigger(
+            hours=hours, minutes=minutes, seconds=seconds), args=args)
+        logger.info("Scheduled background task: %s", name)
 
 def sig_handler(signum=None, frame=None):
     if signum is not None:
@@ -189,7 +234,7 @@ def sig_handler(signum=None, frame=None):
 
 def shutdown(restart=False, update=False):
     #cherrypy.engine.exit()
-    #SCHED.shutdown(wait=False)
+    SCHED.shutdown(wait=False)
 
     CONFIG.write()
 
