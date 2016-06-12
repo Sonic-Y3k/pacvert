@@ -208,7 +208,7 @@ def initialize_scheduler():
 
 def schedule_job(function, name, hours=0, minutes=0, seconds=0, args=None):
     """
-    Start scheduled job if starting or restarting plexpy.
+    Start scheduled job if starting or restarting pacvert.
     Reschedule job if Interval Settings have changed.
     Remove job if if Interval Settings changed to 0
     """
