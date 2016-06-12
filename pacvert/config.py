@@ -46,6 +46,7 @@ _CONFIG_DEFINITIONS = {
     'GIT_USER': (str, 'General', 'Sonic-Y3k'),
     'LOG_BLACKLIST': (int, 'General', 1),
     'LOG_DIR': (str, 'General', ''),
+    'VERIFY_SSL_CERT': (bool_int, 'Advanced', 1),
 }
 
 _BLACKLIST_KEYS = []
