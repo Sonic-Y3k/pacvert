@@ -21,6 +21,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 import config
 #import database
 import logger
+import scanner
 import versioncheck
 import pacvert.config
 
@@ -198,6 +199,13 @@ def initialize_scheduler():
         else:
             minutes = 0
         schedule_job(versioncheck.checkGithub, 'Check GitHub for updates', hours=0, minutes=minutes)
+
+        # Scan for files
+        if CONFIG.SCAN_DIRECTORIES and len(CONFIG.SCAN_DIRECTORIES_PATH) > 0:
+            seconds = CONFIG.SCAN_DIRECTORIES_INTERVAL
+        else:
+            seconds = 0
+        schedule_job(scanner.scan, 'Scan directories for new files', hours=0, minutes=0, seconds=seconds)
 
         # Start scheduler
         if start_jobs and len(SCHED.get_jobs()):
