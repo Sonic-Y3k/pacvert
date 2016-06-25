@@ -1,17 +1,4 @@
 # This file is part of pacvert.
-#
-#  pacvert is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#
-#  pacvert is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with pacvert.  If not, see <http://www.gnu.org/licenses/>.
 
 import arrow
 import os
@@ -48,7 +35,8 @@ _CONFIG_DEFINITIONS = {
     'LOG_DIR': (str, 'General', ''),
     'SCAN_DIRECTORIES': (bool_int, 'General', 0),
     'SCAN_DIRECTORIES_INTERVAL': (int, 'General', 30),
-    'SCAN_DIRECTORIES_PATH': (list, 'General', []),
+    'SCAN_DIRECTORIES_PATH': (str, 'General', ''),
+    'SEARCH_FILE_FORMATS': (list, 'General', [".3g2",".3gp",".asf",".avi",".divx",".flv",".m2ts",".m4v",".mj2",".mkv",".mov",".mp4",".mpeg",".mpg",".ogv",".rm",".rmvb",".vob",".wmv"]),
     'VERIFY_SSL_CERT': (bool_int, 'Advanced', 1),
 }
 

@@ -42,6 +42,14 @@ def checked(variable):
     else:
         return ''
 
+def fullpathToFilename(fullpath):
+    return os.path.basename(fullpath)
+
+def fullpathToPath(fullpath):
+    return os.path.dirname(fullpath)
+
+def fullpathToExtension(fullpath):
+    return os.path.splitext(fullpathToFilename(fullpath))[1]
 
 def radio(variable, pos):
 

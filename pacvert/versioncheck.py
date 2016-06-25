@@ -150,7 +150,7 @@ def checkGithub():
 
     if pacvert.COMMITS_BEHIND > 0:
         logger.info('New version is available. You are %s commits behind' % pacvert.COMMITS_BEHIND)
-    elif plepacvertxpy.COMMITS_BEHIND == 0:
+    elif pacvert.COMMITS_BEHIND == 0:
         logger.info('Pacvert is up to date')
 
     return pacvert.LATEST_VERSION
