@@ -16,7 +16,8 @@ def scan():
     #print(pacvert.CONFIG.SCAN_DIRECTORIES_PATH)
     for root,dirnames,filenames in walk(pacvert.CONFIG.SCAN_DIRECTORIES_PATH):
         for filename in filenames:
-            add_file_to_queue(path.join(root,filename))
+            if not is_file_ignored(path.join(root,filename)):
+                add_file_to_queue(path.join(root,filename))
 
 def add_file_to_queue(inputfile):
     """
@@ -24,13 +25,35 @@ def add_file_to_queue(inputfile):
     """
     
     if path.isfile(inputfile) \
-        and not is_file_in_queue(inputfile) \
+        and has_file_valid_extension(inputfile) \
         and is_file_old_enough(inputfile) \
-        and has_file_valid_extension(inputfile):
-        logger.info("New file: '"+inputfile+"'")
-        pacvert.WORKING_QUEUE.append(ScannedFile(inputfile))
+        and not is_file_in_output_dir(inputfile) \
+        and not is_file_in_queue(inputfile):
+        newfile = ScannedFile(inputfile)
+
+        if len(newfile.mediainfo.tracks) > 1:
+            logger.info("New file: '"+inputfile+"'")
+            pacvert.WORKING_QUEUE.append(newfile)
+            pacvert.IGNORE_QUEUE.append(inputfile)
+        else:
+            logger.debug("File '"+inputfile+"' doesn't have any tracks. It will be ignored.")
+            pacvert.IGNORE_QUEUE.append(inputfile)
     elif not path.isfile(inputfile):
         logger.error("File '"+inputfile+"' doesn't exist.")
+
+def is_file_in_output_dir(inputfile):
+    """
+    """
+    return False
+
+def is_file_ignored(inputfile):
+    """
+    Check if we have already decided to defnitly not use that file.
+    """
+    if any(x == inputfile for x in pacvert.IGNORE_QUEUE):
+        return True
+    else:
+        return False
 
 def is_file_in_queue(inputfile):
     """
@@ -66,7 +89,8 @@ def has_file_valid_extension(inputfile):
         logger.debug("File '"+inputfile+"' has a valid extension ("+fullpathToExtension(inputfile)+").")
         return True
     else:
-        logger.debug("File '"+inputfile+"' has a invalid extension ("+fullpathToExtension(inputfile)+").")
+        logger.debug("File '"+inputfile+"' has a invalid extension ("+fullpathToExtension(inputfile)+"). It will be ignored.")
+        pacvert.IGNORE_QUEUE.append(inputfile)
         return False
 
 class ScannedFile:

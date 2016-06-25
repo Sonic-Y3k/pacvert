@@ -68,6 +68,7 @@ HTTP_ROOT = None
 DEV = False
 
 WORKING_QUEUE = []
+IGNORE_QUEUE = []
 
 def initialize(config_file):
     with INIT_LOCK:
