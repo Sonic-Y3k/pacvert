@@ -35,7 +35,7 @@ SYS_PLATFORM = None
 SYS_ENCODING = None
 
 QUIET = False
-VERBOSE = True
+VERBOSE = False
 DAEMON = False
 CREATEPID = False
 PIDFILE = None
