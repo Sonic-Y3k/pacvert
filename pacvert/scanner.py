@@ -1,7 +1,6 @@
 #  This file is part of Pacvert.
 
-import fnmatch
-from os import path, stat, walk,getcwd
+from os import path, stat, walk
 from time import time
 
 import pacvert
