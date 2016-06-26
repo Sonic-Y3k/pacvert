@@ -6,7 +6,7 @@ from time import time
 import pacvert
 import logger
 from pymediainfo import MediaInfo
-from helpers import human_duration, fullpathToExtension
+from helpers import fullpathToPath, fullpathToExtension
 import pacvert.config
 
 def scan():
@@ -43,8 +43,14 @@ def add_file_to_queue(inputfile):
 
 def is_file_in_output_dir(inputfile):
     """
+    Check if a given file is already in our output directory.
     """
-    return False
+    if fullpathToPath(inputfile) == pacvert.CONFIG.OUTPUT_DIRECTORY:
+        logger.debug("File '"+inputfile+"' is in our output directory. It will be ignored.")
+        pacvert.IGNORE_QUEUE.append(inputfile)
+        return True
+    else:
+        return False
 
 def is_file_ignored(inputfile):
     """

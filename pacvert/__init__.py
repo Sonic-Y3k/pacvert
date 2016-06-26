@@ -110,6 +110,16 @@ def initialize(config_file):
                 if not QUIET:
                     sys.stderr.write("Unable to create the log directory. " \
                                      "Logging to screen only.\n")
+        
+        if not CONFIG.OUTPUT_DIRECTORY:
+            CONFIG.OUTPUT_DIRECTORY = os.path.join(DATA_DIR, 'output')
+
+        if not os.path.exists(CONFIG.OUTPUT_DIRECTORY):
+            try:
+                os.makedirs(CONFIG.OUTPUT_DIRECTORY)
+            except OSError:
+                if not QUIET:
+                    sys.stderr.write("Unable to create the output directory.")
 
         # Start the logger, disable console if needed
         logger.initLogger(console=not QUIET, log_dir=CONFIG.LOG_DIR,

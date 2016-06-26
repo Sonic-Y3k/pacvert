@@ -33,6 +33,7 @@ _CONFIG_DEFINITIONS = {
     'GIT_USER': (str, 'General', 'Sonic-Y3k'),
     'LOG_BLACKLIST': (int, 'General', 1),
     'LOG_DIR': (str, 'General', ''),
+    'OUTPUT_DIRECTORY': (str, 'General', ''),
     'SCAN_DIRECTORIES': (bool_int, 'General', 0),
     'SCAN_DIRECTORIES_INTERVAL': (int, 'General', 30),
     'SCAN_DIRECTORIES_PATH': (str, 'General', ''),
