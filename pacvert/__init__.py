@@ -125,13 +125,13 @@ def initialize(config_file):
         logger.initLogger(console=not QUIET, log_dir=CONFIG.LOG_DIR,
                           verbose=VERBOSE)
 
-        #if not CONFIG.BACKUP_DIR:
-        #    CONFIG.BACKUP_DIR = os.path.join(DATA_DIR, 'backups')
-        #if not os.path.exists(CONFIG.BACKUP_DIR):
-        #    try:
-        #        os.makedirs(CONFIG.BACKUP_DIR)
-        #    except OSError as e:
-        #        logger.error("Could not create backup dir '%s': %s" % (CONFIG.BACKUP_DIR, e))
+        if not CONFIG.BACKUP_DIR:
+            CONFIG.BACKUP_DIR = os.path.join(DATA_DIR, 'backups')
+        if not os.path.exists(CONFIG.BACKUP_DIR):
+            try:
+                os.makedirs(CONFIG.BACKUP_DIR)
+            except OSError as e:
+                logger.error("Could not create backup dir '%s': %s" % (CONFIG.BACKUP_DIR, e))
 
         #if not CONFIG.CACHE_DIR:
         #    CONFIG.CACHE_DIR = os.path.join(DATA_DIR, 'cache')

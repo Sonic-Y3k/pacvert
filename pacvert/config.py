@@ -23,6 +23,7 @@ def bool_int(value):
 FILENAME = "config.ini"
 
 _CONFIG_DEFINITIONS = {
+    'BACKUP_DIR': (str, 'General', ''),
     'CHECK_GITHUB': (int, 'General', 1),
     'CHECK_GITHUB_INTERVAL': (int, 'General', 360),
     'CHECK_GITHUB_ON_STARTUP': (int, 'General', 1),
@@ -43,7 +44,6 @@ _CONFIG_DEFINITIONS = {
 
 _BLACKLIST_KEYS = []
 _WHITELIST_KEYS = []
-
 
 def make_backup(cleanup=False, scheduler=False):
     """ Makes a backup of config file, removes all but the last 5 backups """
@@ -91,6 +91,7 @@ class Config(object):
         """ Initialize the config with values from a file """
         self._config_file = config_file
         self._config = ConfigObj(self._config_file, encoding='utf-8')
+        
         for key in _CONFIG_DEFINITIONS.keys():
             self.check_setting(key)
         self._upgrade()
@@ -149,7 +150,6 @@ class Config(object):
                 new_config[key] = {}
             for subkey, value in subkeys.items():
                 new_config[key][subkey] = value
-
         # next make sure that everything we expect to have defined is so
         for key in _CONFIG_DEFINITIONS.keys():
             key, definition_type, section, ini_key, default = self._define(key)
@@ -160,7 +160,6 @@ class Config(object):
 
         # Write it to file
         logger.info(u"pacvert Config :: Writing configuration to file")
-
         try:
             new_config.write()
         except IOError as e:
