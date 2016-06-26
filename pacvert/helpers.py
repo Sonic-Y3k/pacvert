@@ -21,6 +21,49 @@ import xmltodict
 
 import pacvert
 import logger
+#from pacvert.api2 import API2
+
+def fullpathToFilename(fullpath):
+    return os.path.basename(fullpath)
+
+def fullpathToPath(fullpath):
+    return os.path.dirname(fullpath)
+
+def fullpathToExtension(fullpath):
+    return os.path.splitext(fullpathToFilename(fullpath))[1]
+
+def addtoapi(*dargs, **dkwargs):
+    """ Helper decorator that adds function to the API class.
+        is used to reuse as much code as possible
+
+        args:
+            dargs: (string, optional) Used to rename a function
+
+        Example:
+            @addtoapi("i_was_renamed", "im_a_second_alias")
+            @addtoapi()
+
+    """
+    def rd(function):
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            return function(*args, **kwargs)
+
+        if dargs:
+            # To rename the function if it sucks.. and
+            # allow compat with old api.
+            for n in dargs:
+                if function.__doc__ and len(function.__doc__):
+                    function.__doc__ = function.__doc__.strip()
+                setattr(API2, n, function)
+            return wrapper
+
+        if function.__doc__ and len(function.__doc__):
+            function.__doc__ = function.__doc__.strip()
+        setattr(API2, function.__name__, function)
+        return wrapper
+
+    return rd
 
 def multikeysort(items, columns):
     comparers = [((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in columns]
@@ -42,14 +85,6 @@ def checked(variable):
     else:
         return ''
 
-def fullpathToFilename(fullpath):
-    return os.path.basename(fullpath)
-
-def fullpathToPath(fullpath):
-    return os.path.dirname(fullpath)
-
-def fullpathToExtension(fullpath):
-    return os.path.splitext(fullpathToFilename(fullpath))[1]
 
 def radio(variable, pos):
 

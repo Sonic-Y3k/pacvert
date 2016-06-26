@@ -92,8 +92,9 @@ class Config(object):
         self._config_file = config_file
         self._config = ConfigObj(self._config_file, encoding='utf-8')
         
-        for key in _CONFIG_DEFINITIONS.keys():
+        for key, value in sorted(_CONFIG_DEFINITIONS.iteritems(), key=lambda (v,k): (v,k)):
             self.check_setting(key)
+        
         self._upgrade()
         self._blacklist()
 
