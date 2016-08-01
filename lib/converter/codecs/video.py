@@ -267,6 +267,8 @@ class H264Codec(VideoCodec):
         # http://mewiki.project357.com/wiki/X264_Settings#profile
         'profile': str,  # default: not-set, for valid values see above link
         'tune': str,  # default: not-set, for valid values see above link
+        'maxrate': int, # default: not-set, only valid if bufsize is set aswell
+        'bufsize': int, # default: not-set, should be at least double the bitrate.
     })
 
     def _codec_specific_parse_options(self, safe):
@@ -275,6 +277,12 @@ class H264Codec(VideoCodec):
             if q < 0 or q > 51:
                 del safe['quality']
         return safe
+        if 'maxrate' in safe and 'bufsize' in safe:
+            a = safe['maxrate']
+            b = safe['bufsize']
+            if (2*a) < b:
+                del safe['maxrate']
+                del safe['bufsize']
 
     def _codec_specific_produce_ffmpeg_list(self, safe):
         optlist = []
@@ -286,6 +294,9 @@ class H264Codec(VideoCodec):
             optlist.extend(['-profile', safe['profile']])
         if 'tune' in safe:
             optlist.extend(['-tune', safe['tune']])
+        if 'maxrate' in safe and 'bufsize' in safe:
+            optlist.extend(['-maxrate', safe['maxrate']])
+            optlist.extend(['-bufsize', safe['bufsize']])
         return optlist
 
 class VaapiH264Codec(VideoCodec):
