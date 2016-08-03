@@ -6,7 +6,7 @@ import threading
 import time
 
 from pacvert.converter import Converter
-
+from pacvert.converter_ffmpeg import FFMpegError, FFMpegConvertError
 c = Converter()
 
 def start_thread():
@@ -20,22 +20,25 @@ def run():
     while True:
         if len(pacvert.WORKING_QUEUE) > 0 and not pacvert.WORKING_QUEUE[0].processing:
             pacvert.WORKING_QUEUE[0].processing = True
-            conv = c.convert(pacvert.WORKING_QUEUE[0].fullpath, '/tmp/output.mkv',
-            {
-                'format': 'mkv',
-                'video': {
-                   'codec': 'hevc',
-                    'width': 720,
-                    'height': 400,
-                    'fps': 1,
-                },
-                'audio': {
-                    'codec': 'copy',
-                }
-            })
-            for timecode in conv:
-                logger.debug("Converting ("+str(timecode)+")...")
-            pacvert.WORKING_QUEUE.pop(0)
-            logger.debug("Finished File")
+            try:
+                conv = c.convert(pacvert.WORKING_QUEUE[0].fullpath, '/tmp/output.mkv',
+                {
+                    'format': 'mkv',
+                    'video': {
+                       'codec': 'hevc',
+                        'width': 720,
+                        'height': 400,
+                        'fps': 1,
+                    },
+                    'audio': {
+                        'codec': 'copy',
+                    }
+                })
+                for timecode in conv:
+                    logger.debug("Converting ("+str(timecode)+")...")
+                pacvert.WORKING_QUEUE.pop(0)
+                logger.debug("Finished File")
+            except FFMpegConvertError as e:
+                logger.error("ffmpeg: " +e.message + " with command: "+ e.cmd)
             time.sleep(1)
 
