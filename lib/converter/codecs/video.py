@@ -276,13 +276,13 @@ class H264Codec(VideoCodec):
             q = safe['quality']
             if q < 0 or q > 51:
                 del safe['quality']
-        return safe
         if 'maxrate' in safe and 'bufsize' in safe:
             a = safe['maxrate']
             b = safe['bufsize']
             if (2*a) < b:
                 del safe['maxrate']
                 del safe['bufsize']
+        return safe
 
     def _codec_specific_produce_ffmpeg_list(self, safe):
         optlist = []
@@ -333,6 +333,36 @@ class VaapiH264Codec(VideoCodec):
             optlist.extend(['-crf', str(safe['quality'])])
         if 'profile' in safe:
             optlist.extend(['-profile', safe['profile']])
+        return optlist
+
+class HevcCodec(VideoCodec):
+
+    """
+    HEVC video codec.
+    """
+    codec_name = 'hevc'
+    ffmpeg_codec_name = 'libx265'
+    encoder_options = VideoCodec.encoder_options.copy()
+    encoder_options.update({
+        'quality': int, # constant rate factor, range:0(lossless)-51(worst)
+                        # default:23, recommended: 18-28
+        'pix_fmt': str, # Set pixel format
+                        # default: yuv420, recommended: yuv420p10 (10 Bit)
+    })
+
+    def _codec_specific_parse_options(self, safe):
+        if 'quality' in safe:
+            q = safe['quality']
+            if q < 0 or q > 51:
+                del safe['quality']
+        return safe
+
+    def _codec_specific_produce_ffmpeg_list(self, safe):
+        optlist = []
+        if 'quality' in safe:
+            optlist.extend(['-crf', str(safe['quality'])])
+        if 'pix_fmt' in safe:
+            optlist.extend(['-pix_fmt', safe['pix_fmt']])
         return optlist
 
 class DivxCodec(VideoCodec):
