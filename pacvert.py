@@ -19,7 +19,7 @@ import signal
 import time
 
 import pacvert
-from pacvert import config, logger
+from pacvert import config, logger, queue_worker
 
 # Register signals, such as CTRL + C
 signal.signal(signal.SIGINT, pacvert.sig_handler)
@@ -159,6 +159,11 @@ def main():
 
     # Start the background threads
     pacvert.start()
+
+    try:
+        queue_worker.start_thread()
+    except:
+        logger.warn(u"Whaaaat?")
 
     # Open connection for websocket
     #if pacvert.CONFIG.MONITORING_USE_WEBSOCKET:

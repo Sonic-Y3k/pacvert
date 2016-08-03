@@ -2,6 +2,10 @@
 
 import errno
 import os
+
+#import pacvert
+#import logger
+
 from converter_codecs import codec_lists
 from converter_formats import format_list
 from converter_ffmpeg import FFMpeg

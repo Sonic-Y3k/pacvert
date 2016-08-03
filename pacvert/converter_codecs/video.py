@@ -222,34 +222,6 @@ class VideoCopyCodec(VideoCodec):
         return ['-vcodec', 'copy']
 
 
-class TheoraCodec(VideoCodec):
-
-    """
-    Theora video codec.
-    @see http://ffmpeg.org/trac/ffmpeg/wiki/TheoraVorbisEncodingGuide
-    """
-    codec_name = 'theora'
-    ffmpeg_codec_name = 'libtheora'
-    encoder_options = VideoCodec.encoder_options.copy()
-    encoder_options.update({
-        'quality': int,  # audio quality. Range is 0-10(highest quality)
-        # 5-7 is a good range to try (default is 200k bitrate)
-    })
-
-    def _codec_specific_parse_options(self, safe):
-        if 'quality' in safe:
-            q = safe['quality']
-            if q < 0 or q > 10:
-                del safe['quality']
-        return safe
-
-    def _codec_specific_produce_ffmpeg_list(self, safe):
-        optlist = []
-        if 'quality' in safe:
-            optlist.extend(['-qscale:v', str(safe['quality'])])
-        return optlist
-
-
 class H264Codec(VideoCodec):
 
     """
@@ -299,41 +271,6 @@ class H264Codec(VideoCodec):
             optlist.extend(['-bufsize', safe['bufsize']])
         return optlist
 
-class VaapiH264Codec(VideoCodec):
-
-    """
-    H.264/AVC video codec.
-    @see https://wiki.libav.org/Hardware/vaapi#H.264
-    """
-    codec_name = 'h264_vaapi'
-    ffmpeg_codec_name = 'h264_vaapi'
-    encoder_options = VideoCodec.encoder_options.copy()
-    encoder_options.update({
-        'preset': str,  # common presets are ultrafast, superfast, veryfast,
-        # faster, fast, medium(default), slow, slower, veryslow
-        'quality': int,  # constant rate factor, range:0(lossless)-51(worst)
-        # default:23, recommended: 18-28
-        'profile': str,  # default: not-set, for valid values see above link
-    })
-
-    def _codec_specific_parse_options(self, safe):
-        if 'quality' in safe:
-            q = safe['quality']
-            if q < 0 or q > 51:
-                del safe['quality']
-        return safe
-
-    def _codec_specific_produce_ffmpeg_list(self, safe):
-        optlist = []
-        # ffmpeg must run with -vaapi_device /dev/dri/renderD128 -hwaccel vaapi -hwaccel_output_format vaapi before -i
-        optlist.extend(['-vf', 'format=nv12|vaapi,hwupload'])
-        if 'preset' in safe:
-            optlist.extend(['-preset', safe['preset']])
-        if 'quality' in safe:
-            optlist.extend(['-crf', str(safe['quality'])])
-        if 'profile' in safe:
-            optlist.extend(['-profile', safe['profile']])
-        return optlist
 
 class HevcCodec(VideoCodec):
 
@@ -344,10 +281,11 @@ class HevcCodec(VideoCodec):
     ffmpeg_codec_name = 'libx265'
     encoder_options = VideoCodec.encoder_options.copy()
     encoder_options.update({
+        'preset': str,  # common presets are ultrafast, superfast, veryfast,
+                        # faster, fast, medium(default), slow, slower, veryslow
+        'tune': str,    # common tune are psnr, ssim, grain, fastdecode, zerolatency
         'quality': int, # constant rate factor, range:0(lossless)-51(worst)
                         # default:23, recommended: 18-28
-        'pix_fmt': str, # Set pixel format
-                        # default: yuv420, recommended: yuv420p10 (10 Bit)
     })
 
     def _codec_specific_parse_options(self, safe):
@@ -359,37 +297,12 @@ class HevcCodec(VideoCodec):
 
     def _codec_specific_produce_ffmpeg_list(self, safe):
         optlist = []
+        if 'preset' in safe:
+            optlist.extend(['-preset', safe['preset']])
+        if 'tune' in safe:
+            optlist.extend(['-tune', safe['tune']])
         if 'quality' in safe:
             optlist.extend(['-crf', str(safe['quality'])])
-        if 'pix_fmt' in safe:
-            optlist.extend(['-pix_fmt', safe['pix_fmt']])
-        return optlist
-
-class DivxCodec(VideoCodec):
-
-    """
-    DivX video codec.
-    """
-    codec_name = 'divx'
-    ffmpeg_codec_name = 'mpeg4'
-    encoder_options = VideoCodec.encoder_options.copy()
-    encoder_options.update({
-        'quality': int,  # quality, range:1(lossless)-31(worst)
-        # 2 is visually lossless. Doubling the value results in half the bitrate.
-        # recommended: 3-5, http://slhck.info/video-encoding
-    })
-
-    def _codec_specific_parse_options(self, safe):
-        if 'quality' in safe:
-            q = safe['quality']
-            if q < 1 or q > 31:
-                del safe['quality']
-        return safe
-
-    def _codec_specific_produce_ffmpeg_list(self, safe):
-        optlist = []
-        if 'quality' in safe:
-            optlist.extend(['-qscale:v', str(safe['quality'])])
         return optlist
 
 
@@ -429,111 +342,3 @@ class Vp8Codec(VideoCodec):
             optlist.extend(['-threads', str(safe['threads'])])
         return optlist
 
-
-class H263Codec(VideoCodec):
-
-    """
-    H.263 video codec.
-    """
-    codec_name = 'h263'
-    ffmpeg_codec_name = 'h263'
-
-
-class FlvCodec(VideoCodec):
-
-    """
-    Flash Video codec.
-    """
-    codec_name = 'flv'
-    ffmpeg_codec_name = 'flv'
-
-
-class MpegCodec(VideoCodec):
-
-    """
-    Base MPEG video codec.
-    """
-    encoder_options = VideoCodec.encoder_options.copy()
-    encoder_options.update({
-        'quality': int,  # quality, range:1(lossless)-31(worst)
-        # 2 is visually lossless. Doubling the value results in half the bitrate.
-        # recommended: 3-5, http://slhck.info/video-encoding
-    })
-
-    # Workaround for a bug in ffmpeg in which aspect ratio
-    # is not correctly preserved, so we have to set it
-    # again in vf; take care to put it *before* crop/pad, so
-    # it uses the same adjusted dimensions as the codec itself
-    # (pad/crop will adjust it further if neccessary)
-    def _codec_specific_parse_options(self, safe):
-        w = safe['width']
-        h = safe['height']
-
-        if w and h:
-            filters = safe['aspect_filters']
-            tmp = 'aspect=%d:%d' % (w, h)
-
-            if filters is None:
-                safe['aspect_filters'] = tmp
-            else:
-                safe['aspect_filters'] = tmp + ',' + filters
-
-        if 'quality' in safe:
-            q = safe['quality']
-            if q < 1 or q > 31:
-                del safe['quality']
-
-        return safe
-
-    def _codec_specific_produce_ffmpeg_list(self, safe):
-        optlist = []
-        if 'quality' in safe:
-            optlist.extend(['-qscale:v', str(safe['quality'])])
-        return optlist
-
-
-class Mpeg1Codec(MpegCodec):
-
-    """
-    MPEG-1 video codec.
-    """
-    codec_name = 'mpeg1'
-    ffmpeg_codec_name = 'mpeg1video'
-
-
-class Mpeg2Codec(MpegCodec):
-
-    """
-    MPEG-2 video codec.
-    """
-    codec_name = 'mpeg2'
-    ffmpeg_codec_name = 'mpeg2video'
-
-
-class WmvCodec(VideoCodec):
-
-    """
-    WMV video codec.
-    """
-    codec_name = 'wmv'
-    ffmpeg_codec_name = 'msmpeg4'
-    encoder_options = VideoCodec.encoder_options.copy()
-    encoder_options.update({
-        'quality': int,  # quality, range:1(lossless)-31(worst)
-        # 2 is visually lossless. Doubling the value results in half the bitrate.
-        # recommended: 3-5, http://slhck.info/video-encoding
-    })
-
-    def _codec_specific_parse_options(self, safe):
-        if 'quality' in safe:
-            q = safe['quality']
-            if q < 1 or q > 31:
-                del safe['quality']
-
-        return safe
-
-    def _codec_specific_produce_ffmpeg_list(self, safe):
-        optlist = []
-        if 'quality' in safe:
-            optlist.extend(['-qscale:v', str(safe['quality'])])
-        return optlist

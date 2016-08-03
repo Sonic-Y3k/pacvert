@@ -60,6 +60,6 @@ class BaseCodec(with_metaclass(MetaBaseCodec, object)):
         return safe
 
 
-from codecs.audio import *
-from codecs.subtitle import *
-from codecs.video import *
+from pacvert.converter_codecs.audio import *
+from pacvert.converter_codecs.subtitle import *
+from pacvert.converter_codecs.video import *

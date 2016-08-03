@@ -3,15 +3,15 @@
 import os.path
 import os
 import re
-import signal
+import threading
 from subprocess import Popen, PIPE
-import logging
 import locale
 
-logger = logging.getLogger(__name__)
+import pacvert
+import logging
+logger = logging.getLogger("pacvert")
 
 console_encoding = locale.getdefaultlocale()[1] or 'UTF-8'
-
 
 class FFMpegError(Exception):
     pass
@@ -435,14 +435,14 @@ class FFMpeg(object):
         except OSError:
             raise FFMpegError('Error while calling ffmpeg binary')
 
-        if timeout:
-            def on_sigvtalrm(*_):
-                signal.signal(signal.SIGVTALRM, signal.SIG_DFL)
-                if p.poll() is None:
-                    p.kill()
-                raise Exception('timed out while waiting for ffmpeg')
+        #if timeout:
+        #    def on_sigvtalrm(*_):
+        #        signal.signal(signal.SIGVTALRM, signal.SIG_DFL)
+        #        if p.poll() is None:
+        #            p.kill()
+        #        raise Exception('timed out while waiting for ffmpeg')
 
-            signal.signal(signal.SIGVTALRM, on_sigvtalrm)
+        #    signal.signal(signal.SIGVTALRM, on_sigvtalrm)
 
         yielded = False
         buf = ''
@@ -463,13 +463,13 @@ class FFMpeg(object):
             return None
 
         while True:
-            if timeout:
-                signal.setitimer(signal.ITIMER_VIRTUAL, timeout)
+            #if timeout:
+            #    signal.setitimer(signal.ITIMER_VIRTUAL, timeout)
 
             ret = p.stderr.read(10)
 
-            if timeout:
-                signal.setitimer(signal.ITIMER_VIRTUAL, 0)
+            #if timeout:
+            #    signal.setitimer(signal.ITIMER_VIRTUAL, 0)
 
             if not ret:
                 break
@@ -490,8 +490,8 @@ class FFMpeg(object):
                 yielded = True
                 yield timecode
 
-        if timeout:
-            signal.signal(signal.SIGALRM, signal.SIG_DFL)
+        #if timeout:
+        #    signal.signal(signal.SIGALRM, signal.SIG_DFL)
 
         p.communicate()  # wait for process to exit
 
@@ -502,10 +502,10 @@ class FFMpeg(object):
         if '\n' in total_output:
             line = total_output.split('\n')[-2]
 
-            if line.startswith('Received signal'):
+            #if line.startswith('Received signal'):
                 # Received signal 15: terminating.
-                raise FFMpegConvertError(
-                    line.split(':')[0], cmd, total_output, pid=p.pid)
+            #    raise FFMpegConvertError(
+            #        line.split(':')[0], cmd, total_output, pid=p.pid)
             if line.startswith(infile + ': '):
                 err = line[len(infile) + 2:]
                 raise FFMpegConvertError('Encoding error', cmd, total_output,

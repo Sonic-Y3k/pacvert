@@ -21,6 +21,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 import config
 #import database
 import logger
+import queue_worker
 import scanner
 import versioncheck
 import pacvert.config
@@ -218,6 +219,9 @@ def initialize_scheduler():
         else:
             seconds = 0
         schedule_job(scanner.scan, 'Scan directories for new files', hours=0, minutes=0, seconds=seconds)
+
+        # Work on queue
+        #schedule_job(queue_worker.queue_worker, 'Work on queue', hours=0, minutes=0, seconds=5)
 
         # Start scheduler
         if start_jobs and len(SCHED.get_jobs()):

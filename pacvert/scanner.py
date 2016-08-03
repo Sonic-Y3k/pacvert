@@ -105,8 +105,8 @@ class ScannedFile:
     """
     fullpath = None
     mediainfo = None
-    processed = None
+    processing = None
     def __init__(self, fpath):
         self.fullpath = fpath
         self.mediainfo = MediaInfo.parse(self.fullpath)
-        self.processed = False
+        self.processing = False
