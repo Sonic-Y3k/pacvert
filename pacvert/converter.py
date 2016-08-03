@@ -2,9 +2,9 @@
 
 import errno
 import os
-from converter.codecs import codec_lists
-from converter.formats import format_list
-from converter.ffmpeg import FFMpeg
+from converter_codecs import codec_lists
+from converter_formats import format_list
+from converter_ffmpeg import FFMpeg
 
 
 class ConverterError(Exception):
