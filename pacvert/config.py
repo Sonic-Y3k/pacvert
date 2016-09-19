@@ -27,6 +27,27 @@ _CONFIG_DEFINITIONS = {
     'CHECK_GITHUB': (int, 'General', 1),
     'CHECK_GITHUB_INTERVAL': (int, 'General', 360),
     'CHECK_GITHUB_ON_STARTUP': (int, 'General', 1),
+    'CODEC_VIDEO_H264_ADDITIONALOPT': (list, 'VideoCodec', []),
+    'CODEC_VIDEO_H264_AUTOMAXRATE': (bool, 'VideoCodec', True),
+    'CODEC_VIDEO_H264_BUFSIZE': (int, 'VideoCodec', -1),
+    'CODEC_VIDEO_H264_MAXRATE': (int, 'VideoCodec', -1),
+    'CODEC_VIDEO_H264_PRESET': (str, 'VideoCodec', 'slow'),
+    'CODEC_VIDEO_H264_PROFILE': (str, 'VideoCodec', 'high'),
+    'CODEC_VIDEO_H264_QUALITY': (float, 'VideoCodec', 18.0),
+    'CODEC_VIDEO_H264_TUNE': (str, 'VideoCodec', 'film'),
+    'CODEC_VIDEO_H264_TWOPASS': (bool, 'VideoCodec', False),
+    'CODEC_VIDEO_H264_TWOPASS_BITRATE': (int, 'VideoCodec', -1),
+    'CODEC_VIDEO_HEVC_ADDITIONALOPT': (list, 'VideoCodec', [['pix_fmt', 'yuv420p10'],['x265-params', 'aq-mode=3']]),
+    'CODEC_VIDEO_HEVC_AUTOMAXRATE': (bool, 'VideoCodec', True),
+    'CODEC_VIDEO_HEVC_BUFSIZE': (int, 'VideoCodec', -1),
+    'CODEC_VIDEO_HEVC_MAXRATE': (int, 'VideoCodec', -1),
+    'CODEC_VIDEO_HEVC_PRESET': (str, 'VideoCodec', 'slow'),
+    'CODEC_VIDEO_HEVC_QUALITY': (float, 'VideoCodec', 18.0),
+    'CODEC_VIDEO_HEVC_TUNE': (str, 'VideoCodec', ''),
+    'CODEC_VIDEO_HEVC_TWOPASS': (bool, 'VideoCodec', False),
+    'CODEC_VIDEO_HEVC_TWOPASS_BITRATE': (int, 'VideoCodec', -1),
+    'CODEC_VIDEO_VP8_QUALITY': (float, 'VideoCodec', 10),
+    'CODEC_VIDEO_VP8_THREADS': (int, 'VideoCodec', 1),
     'DO_NOT_OVERRIDE_GIT_BRANCH': (int, 'General', 0),
     'GIT_BRANCH': (str, 'General', 'master'),
     'GIT_PATH': (str, 'General', ''),
@@ -91,8 +112,8 @@ class Config(object):
         """ Initialize the config with values from a file """
         self._config_file = config_file
         self._config = ConfigObj(self._config_file, encoding='utf-8')
-        
-        for key, value in sorted(_CONFIG_DEFINITIONS.iteritems(), key=lambda (v,k): (v,k)):
+
+        for key, value in sorted(_CONFIG_DEFINITIONS.iteritems(), key=lambda(v,k): (v,k)):
             self.check_setting(key)
         
         self._upgrade()
