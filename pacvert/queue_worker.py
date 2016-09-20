@@ -25,13 +25,13 @@ def run():
                 {
                     'format': 'mkv',
                     'video': {
-                       'codec': 'hevc',
+                       'codec': pacvert.DEFAULT_CODEC_VIDEO,
                         'width': 720,
                         'height': 400,
                         'fps': 1,
                     },
                     'audio': {
-                        'codec': 'copy',
+                        'codec': pacvert.DEFAULT_CODEC_AUDIO,
                     }
                 })
                 for timecode in conv:

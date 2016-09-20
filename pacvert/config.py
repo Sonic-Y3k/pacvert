@@ -52,7 +52,7 @@ _CONFIG_DEFINITIONS = {
     'DEFAULT_CODEC_AUDIO_CONVERT': (bool, 'CodecSettings', False),
     'DEFAULT_CODEC_SUBTITLE': (str, 'CodecSettings', 'copy'),
     'DEFAULT_CODEC_SUBTITLE_CONVERT': (bool, 'CodecSettings', False),
-    'DEFAULT_CODEC_VIDEO': (str, 'CodecSettings', 'HEVC'),
+    'DEFAULT_CODEC_VIDEO': (str, 'CodecSettings', 'hevc'),
     'DEFAULT_CODEC_VIDEO_CONVERT': (bool, 'CodecSettings', True),
     'DO_NOT_OVERRIDE_GIT_BRANCH': (int, 'General', 0),
     'GIT_BRANCH': (str, 'General', 'master'),
