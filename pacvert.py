@@ -19,7 +19,7 @@ import signal
 import time
 
 import pacvert
-from pacvert import config, logger, queue_worker
+from pacvert import config, logger, queue_worker, webstart
 
 # Register signals, such as CTRL + C
 signal.signal(signal.SIGINT, pacvert.sig_handler)
@@ -165,22 +165,39 @@ def main():
     except:
         logger.warn(u"Whaaaat?")
 
-    # Open connection for websocket
-    #if pacvert.CONFIG.MONITORING_USE_WEBSOCKET:
-    #    try:
-    #        web_socket.start_thread()
-    #    except:
-    #        logger.warn(u"Websocket :: Unable to open connection.")
-    #        # Fallback to polling
-    #        pacvert.POLLING_FAILOVER = True
-    #        pacvert.initialize_scheduler()
-
     # Force the http port if neccessary
-    #if args.port:
-    #    http_port = args.port
-    #    logger.info('Using forced web server port: %i', http_port)
-    #else:
-    #    http_port = int(pacvert.CONFIG.HTTP_PORT)
+    if args.port:
+        http_port = args.port
+        logger.info('Using forced web server port: %i', http_port)
+    else:
+        http_port = int(pacvert.CONFIG.HTTP_PORT)
+
+    # Check if pyOpenSSL is installed. It is required for certificate generation
+    # and for CherryPy.
+    if pacvert.CONFIG.ENABLE_HTTPS:
+        try:
+            import OpenSSL
+        except ImportError:
+            logger.warn("The pyOpenSSL module is missing. Install this " \
+                        "module to enable HTTPS. HTTPS will be disabled.")
+            pacvert.CONFIG.ENABLE_HTTPS = False
+
+    # Try to start the server. Will exit here is address is already in use.
+    web_config = {
+        'http_port': http_port,
+        'http_host': pacvert.CONFIG.HTTP_HOST,
+        'http_root': pacvert.CONFIG.HTTP_ROOT,
+        'http_environment': pacvert.CONFIG.HTTP_ENVIRONMENT,
+        'http_proxy': pacvert.CONFIG.HTTP_PROXY,
+        'enable_https': pacvert.CONFIG.ENABLE_HTTPS,
+        'https_cert': pacvert.CONFIG.HTTPS_CERT,
+        'https_key': pacvert.CONFIG.HTTPS_KEY,
+        'http_username': pacvert.CONFIG.HTTP_USERNAME,
+        'http_password': pacvert.CONFIG.HTTP_PASSWORD,
+        'http_basic_auth': pacvert.CONFIG.HTTP_BASIC_AUTH
+    }
+
+    webstart.initialize(web_config)
 
     # Wait endlessy for a signal to happen
     while True:
