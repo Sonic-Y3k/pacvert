@@ -91,7 +91,7 @@ except ImportError:
 try:
     __version__ = pkg_resources.require('cherrypy')[0].version
 except Exception:
-    __version__ = 'unknown'
+    __version__ = '8.1.2'
 
 
 # Timeout monitor. We add two channels to the engine
