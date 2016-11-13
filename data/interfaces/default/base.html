@@ -1,0 +1,17 @@
+<%
+    import pacvert
+    from pacvert import version
+    from pacvert.helpers import anon_url
+%>
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Pacvert - ${title}</title>
+			<link href="${http_root}css/pacvert.css" rel="stylesheet">
+	</head>
+	<body class="content">
+		${next.body()}
+	</body>
+</html>

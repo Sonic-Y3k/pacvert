@@ -1,3 +1,35 @@
-<html>
-  <body>Home</body>
-</html>
+<%inherit file="base.html"/>
+
+<%def name="body()">
+<table name="to_process">
+	<thead>
+	<tr>
+		<th>Time added</th>
+		<th>Filename</th>
+		<th>Format</th>
+		<th>Status</th>
+		<th>Progress</th>
+	</tr>
+	</thead>
+% if len(queue) > 0:
+	% for row in queue:
+		% for track in row.mediainfo.tracks:
+			% if track.track_type == 'General':
+
+				<tr>
+					<td>30. Okt 2016 - 14:42</td>
+					<td>${track.file_size}</td>
+					<td>%{track.format}</td>
+					<td>Pending</td>
+					<td>0%</td>
+				</tr>
+			% endif
+		% endfor
+	% endfor
+% else:
+	<tr>
+		<td colspan="5">No items.</td>
+	</tr>
+% endif
+</table>
+</%def>

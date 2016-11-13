@@ -57,7 +57,6 @@ class WebInterface(object):
     ##### home #####
     @cherrypy.expose
     def home(self, **kwargs):
-        config = {
-
-        }
-        return serve_template(templatename="home.html", title="Home", config=config)
+        test = "Test1"
+        queue = pacvert.WORKING_QUEUE
+        return serve_template(templatename="home.html", title="Home", test=test, queue=queue)

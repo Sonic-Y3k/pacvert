@@ -82,7 +82,18 @@ def initialize(options):
             'tools.auth_basic.realm': 'Pacvert web server',
             'tools.auth_basic.checkpassword': cherrypy.lib.auth_basic.checkpassword_dict({
                 options['http_username']: options['http_password']})
-        }
+        },
+        '/css': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': "interfaces/default/css",
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 24 * 30,  # 30 days
+            'tools.auth.on': False,
+            'tools.sessions.on': False
+        },
     }
 
     # Prevent time-outs
