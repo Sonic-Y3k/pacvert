@@ -8,7 +8,7 @@ import time
 import pacvert.config
 from pacvert.converter import Converter
 from pacvert.converter_ffmpeg import FFMpegError, FFMpegConvertError
-from pacvert.helpers import cast_to_int
+from pacvert.helpers import cast_to_int, generateOutputFilename
 
 c = Converter()
 
@@ -37,7 +37,7 @@ def run():
                     video['profile'] = pacvert.CONFIG.CODEC_H264_PROFILE # set profile
                     video['quality'] = pacvert.CONFIG.CODEC_H264_QUALITY # set quality
                     video['tune'] = pacvert.CONFIG.CODEC_H264_TUNE # set tune
-                    if pacvert.CONFIG.CODEC_H264_AUTOMAXRATE: # set max rate
+                    if pacvert.CONFIG.CODEC_H264_AUTOMAXRATE: # if automatic maxrate is enabled
                         if pacvert.CONFIG.CODEC_H264_BUFSIZE < 0 or pacvert.CONFIG.CODEC_H264_MAXRATE < 0:
                             for track in pacvert.WORKING_QUEUE[0].mediainfo.tracks:
                                 if track.track_type == 'Video':
@@ -68,7 +68,7 @@ def run():
                     video['threads'] = pacvert.CONFIG.CODEC_VP8_THREADS # set no of real cores
                 else:
                     logger.error("Codec not yet implemented")
-                conv = c.convert(pacvert.WORKING_QUEUE[0].fullpath, '/tmp/output.mkv',
+                conv = c.convert(pacvert.WORKING_QUEUE[0].fullpath, pacvert.CONFIG.OUTPUT_DIRECTORY+'/'+generateOutputFilename(pacvert.WORKING_QUEUE[0].fullpath),
                 {
                     'format': 'mkv',
                     'video': video,

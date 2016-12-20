@@ -645,11 +645,23 @@ def genChunks(a, n):
     chunksize = cast_to_int(round(a/n))
     return [b*chunksize for b in range(n)]
 
+def generateOutputFilename(filename):
+    """
+    Returns output name
+    """
+    testname = replace_illegal_chars( # remove illegal chars whatsoever
+                fullpathToFilename( # get filename with extension from fullpath
+                os.path.splitext(filename)[0])) # get filename without extension
+    testext  = fullpathToExtension(filename) # get extension from fullpath
+    if os.path.isfile(pacvert.CONFIG.OUTPUT_DIRECTORY+'/'+testname+testext): # if file exists append now() to filename
+        return testname+' ('+now()+')'+testext
+    else: # if not just return
+        return testname+testext
+
 def statusToString(status):
     """
     Translate a numeric status to a printable string
     """
-
     if status == 0:
 	    return "Active"
     elif status == 1:
