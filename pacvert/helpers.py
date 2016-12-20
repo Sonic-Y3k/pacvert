@@ -617,3 +617,46 @@ def build_datatables_json(kwargs, dt_columns, default_sort_col=None):
                     "search": {"value": kwargs.pop("search", "")}
                     }
     return json.dumps(json_data)
+
+def getFrameCountFromMediainfo(mediainfo):
+    """
+    Returns a total frame count if any.
+    """
+    result = -1
+    for track in mediainfo.tracks:
+        if track.track_type == 'Video' and track.frame_count != None:
+            result = int(track.frame_count)
+    return result
+
+def getFrameRateFromMediaInfo(mediainfo):
+    """
+    Teturns the framereate of the video file
+    """
+    result = -1.0
+    for track in mediainfo.tracks:
+        if track.track_type == 'Video' and track.frame_rate != None:
+            result = float(track.frame_rate)
+    return result
+
+def genChunks(a, n):
+    """
+    Splits the range from 1 to a in n equal chunks
+    """
+    chunksize = cast_to_int(round(a/n))
+    return [b*chunksize for b in range(n)]
+
+def statusToString(status):
+    """
+    Translate a numeric status to a printable string
+    """
+
+    if status == 0:
+	    return "Active"
+    elif status == 1:
+	    return "Scanned"
+    elif status == 2:
+	    return "Pending"
+    elif status == 3:
+	    return "Finished"
+    else:
+	    return "Failed"

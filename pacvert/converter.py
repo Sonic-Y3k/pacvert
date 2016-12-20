@@ -266,3 +266,8 @@ class Converter(object):
         See the documentation of converter.FFMpeg.thumbnails() for details.
         """
         return self.ffmpeg.thumbnails(fname, option_list)
+        
+    def cropAnalysis(self, filePath):
+        """
+        """
+        return self.ffmpeg.cropAnalysis(filePath)

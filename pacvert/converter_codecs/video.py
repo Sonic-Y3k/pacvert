@@ -232,15 +232,16 @@ class H264Codec(VideoCodec):
     ffmpeg_codec_name = 'libx264'
     encoder_options = VideoCodec.encoder_options.copy()
     encoder_options.update({
-        'preset': str,  # common presets are ultrafast, superfast, veryfast,
+        'preset': str,      # common presets are ultrafast, superfast, veryfast,
         # faster, fast, medium(default), slow, slower, veryslow
-        'quality': int,  # constant rate factor, range:0(lossless)-51(worst)
+        'quality': float,   # constant rate factor, range:0(lossless)-51(worst)
         # default:23, recommended: 18-28
         # http://mewiki.project357.com/wiki/X264_Settings#profile
-        'profile': str,  # default: not-set, for valid values see above link
-        'tune': str,  # default: not-set, for valid values see above link
-        'maxrate': int, # default: not-set, only valid if bufsize is set aswell
-        'bufsize': int, # default: not-set, should be at least double the bitrate.
+        'profile': str,     # default: not-set, for valid values see above link
+        'tune': str,        # default: not-set, for valid values see above link
+        'maxrate': int,     # default: not-set, only valid if bufsize is set aswell
+        'bufsize': int,     # default: not-set, should be at least double the bitrate.
+        'x264-params': str, # default: not-set, can be used for additional x264 settings
     })
 
     def _codec_specific_parse_options(self, safe):
@@ -251,7 +252,7 @@ class H264Codec(VideoCodec):
         if 'maxrate' in safe and 'bufsize' in safe:
             a = safe['maxrate']
             b = safe['bufsize']
-            if (2*a) < b:
+            if b < (2*a):
                 del safe['maxrate']
                 del safe['bufsize']
         return safe
@@ -267,8 +268,10 @@ class H264Codec(VideoCodec):
         if 'tune' in safe:
             optlist.extend(['-tune', safe['tune']])
         if 'maxrate' in safe and 'bufsize' in safe:
-            optlist.extend(['-maxrate', safe['maxrate']])
-            optlist.extend(['-bufsize', safe['bufsize']])
+            optlist.extend(['-maxrate', str(safe['maxrate'])])
+            optlist.extend(['-bufsize', str(safe['bufsize'])])
+        if 'x264-params' in safe:
+            optlist.extend(['-x264-params', safe['x264-params']])
         return optlist
 
 
@@ -281,11 +284,15 @@ class HevcCodec(VideoCodec):
     ffmpeg_codec_name = 'libx265'
     encoder_options = VideoCodec.encoder_options.copy()
     encoder_options.update({
-        'preset': str,  # common presets are ultrafast, superfast, veryfast,
-                        # faster, fast, medium(default), slow, slower, veryslow
-        'tune': str,    # common tune are psnr, ssim, grain, fastdecode, zerolatency
-        'quality': int, # constant rate factor, range:0(lossless)-51(worst)
-                        # default:23, recommended: 18-28
+        'preset': str,      # common presets are ultrafast, superfast, veryfast,
+                            # faster, fast, medium(default), slow, slower, veryslow
+        'tune': str,        # common tune are psnr, ssim, grain, fastdecode, zerolatency
+        'quality': float,   # constant rate factor, range:0(lossless)-51(worst)
+                            # default:23, recommended: 18-28
+        'maxrate': int,     # default: not-set, only valid if bufsize is set aswell
+        'bufsize': int,     # default: not-set, should be at least double the bitrate.
+        'pix_fmt': str,     # default: not-set, can be used for 10 bit encode e.g. yuv420p10
+        'x265-params': str, # default: not-set, can be used for additional x265 settings
     })
 
     def _codec_specific_parse_options(self, safe):
@@ -293,6 +300,19 @@ class HevcCodec(VideoCodec):
             q = safe['quality']
             if q < 0 or q > 51:
                 del safe['quality']
+        if 'maxrate' in safe and 'bufsize' in safe:
+            a = safe['maxrate']
+            b = safe['bufsize']
+            if b < (2*a):
+                del safe['maxrate']
+                del safe['bufsize']
+        if 'pix_fmt' in safe:
+            pi = safe['pix_fmt']
+            if pi not in [  'yuv420p','yuv420p10','yuv420p12',
+                            'yuv422p','yuv422p10','yuv422p12',
+                            'yuv444p','yuv444p10','yuv444p12',
+                            'gbrp','gbrp10','gbrp12']:
+                del safe['pix_fmt']
         return safe
 
     def _codec_specific_produce_ffmpeg_list(self, safe):
@@ -303,6 +323,13 @@ class HevcCodec(VideoCodec):
             optlist.extend(['-tune', safe['tune']])
         if 'quality' in safe:
             optlist.extend(['-crf', str(safe['quality'])])
+        if 'maxrate' in safe and 'bufsize' in safe:
+            optlist.extend(['-maxrate', str(safe['maxrate'])])
+            optlist.extend(['-bufsize', str(safe['bufsize'])])
+        if 'pix_fmt' in safe:
+            optlist.extend(['-pix_fmt', safe['pix_fmt']])
+        if 'x265-params' in safe:
+            optlist.extend(['-x265-params', safe['x265-params']])
         return optlist
 
 
@@ -315,7 +342,7 @@ class Vp8Codec(VideoCodec):
     ffmpeg_codec_name = 'libvpx'
     encoder_options = VideoCodec.encoder_options.copy()
     encoder_options.update({
-        'quality': int,  # quality, range:0(lossless)-63(worst)
+        'quality': float,  # quality, range:0(lossless)-63(worst)
         # recommended: 10, http://slhck.info/video-encoding
         'threads': int,  # threads number
         # default: 1, recommended: number of real cores - 1

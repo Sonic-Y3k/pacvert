@@ -4,7 +4,7 @@ import os.path
 import os
 import re
 import threading
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT, check_output
 import locale
 
 import pacvert
@@ -519,6 +519,36 @@ class FFMpeg(object):
         if p.returncode != 0:
             raise FFMpegConvertError('Exited with code %d' % p.returncode, cmd,
                                      total_output, pid=p.pid)
+
+    def cropAnalysis(self, filePath):
+        """
+        Calculate cropping rectangle and return it.
+        @param filePath: path to created thumbnails
+        >>> FFMpeg().cropAnalysis('/path/to/directory')
+        """
+        for i in range(10):
+            if not os.path.exists(filePath+'/'+str(i)+'.jpg'):
+                raise IOError('No such directory: '+filePath)
+        
+        cmds = [self.ffmpeg_path]
+        cmds.extend(['-i',filePath+'/%1d.jpg','-vf','cropdetect=24:16:0','-f','null','-'])
+        logger.debug('Spawning ffmpeg with command: ' + ' '.join(cmds))
+        proc_ffmpeg = check_output(cmds, stderr=STDOUT)
+        crop = [0,0,0,0]
+        for c in str(proc_ffmpeg.decode("ISO-8859-1")).split('\n'):
+            if "crop=" in c:
+                temp_crop = c.split(" ")[13].replace("crop=","").split(":")
+                try:
+                    if int(temp_crop[0]) > crop[0]:
+                        crop[0] = int(temp_crop[0])
+                        crop[2] = int(temp_crop[2])
+                
+                    if int(temp_crop[1]) > crop[1]:
+                        crop[1] = int(temp_crop[1])
+                        crop[3] = int(temp_crop[3])
+                except ValueError as e:
+                    logger.error("ffmpeg: " +e.message + " with command: "+ e.cmd)
+        return crop
 
     def thumbnail(self, fname, time, outfile,
                   size=None, quality=DEFAULT_JPEG_QUALITY):

@@ -1,5 +1,9 @@
 <%inherit file="base.html"/>
 
+<%!
+    from pacvert import helpers
+%>
+
 <%def name="body()">
 <div id="oval">
 		<table name="to_process">
@@ -8,6 +12,7 @@
 			<th>Time added</th>
 			<th>Filename</th>
 			<th>Format</th>
+			<th>Size</th>
 			<th>Status</th>
 			<th>Progress</th>
 		</tr>
@@ -16,23 +21,32 @@
 		% for row in queue:
 			% for track in row.mediainfo.tracks:
 				% if track.track_type == 'General':
-
-					<tr>
-						<td>30. Okt 2016 - 14:42</td>
-						<td>${track.file_size}</td>
-						<td>%{track.format}</td>
-						<td>Pending</td>
-						<td>0%</td>
-					</tr>
+					<%
+						general = track
+					%>
+				% elif track.track_type == 'Video':
+					<%
+						video = track
+					%>
+				% elif track.track_type == 'Audio':
+					<%
+						audio = track
+					%>
 				% endif
 			% endfor
+			<tr>
+				<td>${row.added}</td>
+				<td>${helpers.fullpathToFilename(row.fullpath)}</td>
+				<td>${general.format}</td>
+				<td>${helpers.bytes_to_mb(general.file_size)}</td>
+				<td>${helpers.statusToString(row.status)}</td>
+				<td>${row.progress}</td>
+			</tr>
+
 		% endfor
 	% else:
 		<tr class="listelement">
-			<td colspan="5">No items.</td>
-		</tr>
-		<tr class="listelement">
-			<td colspan="5">bla</td>
+			<td colspan="6">No items in queue.</td>
 		</tr>
 	% endif
 	</table>

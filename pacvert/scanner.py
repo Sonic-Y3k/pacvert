@@ -1,13 +1,17 @@
 #  This file is part of Pacvert.
 
-from os import path, stat, walk
+from os import path, stat, walk, remove
 from time import time
+from operator import itemgetter
 
 import pacvert
 import logger
 from pymediainfo import MediaInfo
 from helpers import fullpathToPath, fullpathToExtension
 import pacvert.config
+import helpers
+from pacvert.converter import Converter
+from pacvert.converter_ffmpeg import FFMpegError, FFMpegConvertError
 
 def scan():
     """
@@ -103,10 +107,75 @@ class ScannedFile:
     """
     Object that stores the path and mediainfo of file.
     """
+    added = None
     fullpath = None
     mediainfo = None
-    processing = None
+    crop = None
+
+    """
+    Status variable:
+      0: active
+      1: scanned
+      2: pending
+      3: finished
+      4: error
+    """
+    status = 1
+    progress = 0.0
     def __init__(self, fpath):
-        self.fullpath = fpath
-        self.mediainfo = MediaInfo.parse(self.fullpath)
-        self.processing = False
+        try:
+            self.added = helpers.now()
+            self.fullpath = fpath
+            self.mediainfo = MediaInfo.parse(self.fullpath)
+            self.updateStatus(2)
+            self.createThumbs()
+            self.crop = self.analyzeThumbs()
+            self.deleteThumbs()
+        except Exception as e:
+            logger.error(e)
+
+    def createThumbs(self):
+        """
+        Create thumbnails for crop-rectangle analysis
+        """
+        c = Converter()
+        try:
+            frame_count = helpers.getFrameCountFromMediainfo(self.mediainfo)
+            if frame_count == -1:
+                logger.error("We got a negative frame count from mediainfo.")
+                raise ValueError("We got a negative frame count from mediainfo.")
+            frame_rate = helpers.getFrameRateFromMediaInfo(self.mediainfo)
+            
+            chunks = helpers.genChunks(frame_count,10)
+            
+            filedirectory = helpers.fullpathToPath(self.fullpath)
+            
+            for i in range(10):
+                logger.debug("Creating thumb #"+str(i)+" for "+self.fullpath)
+                c.thumbnail(self.fullpath,helpers.cast_to_int(chunks[i]/frame_rate),filedirectory+'/'+str(i)+'.jpg', None, 5)
+        except Exception as e:
+            logger.error("ffmpeg: " +e.message + " with command: "+ e.cmd)
+
+
+    def analyzeThumbs(self):
+        """
+        """
+        c = Converter()
+        return c.cropAnalysis(helpers.fullpathToPath(self.fullpath))
+
+    def deleteThumbs(self):
+        """
+        """
+        try:
+            for i in range(10):
+                remove(helpers.fullpathToPath(self.fullpath)+'/'+str(i)+'.jpg')
+        except IOError:
+            logger.error("One or more thumbs are not available and therefor cant be deleted.")
+
+    def updateStatus(self, newVal):
+        """
+        Update status of scanned file and resort the queue.
+        """
+        logger.debug("Setting "+self.fullpath+" from status "+helpers.statusToString(self.status).lower()+" to "+helpers.statusToString(newVal).lower())
+        self.status = newVal
+        pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.added))

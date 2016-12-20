@@ -50,7 +50,7 @@ class BaseCodec(with_metaclass(MetaBaseCodec, object)):
         # Only copy options that are expected and of correct type
         # (and do typecasting on them)
         for k, v in opts.items():
-            if k in self.encoder_options:
+            if k in self.encoder_options and v != "": #fix don't accept empty parameter
                 typ = self.encoder_options[k]
                 try:
                     safe[k] = typ(v)
