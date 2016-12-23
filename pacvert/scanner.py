@@ -7,7 +7,7 @@ from operator import itemgetter
 import pacvert
 import logger
 from pymediainfo import MediaInfo
-from helpers import fullpathToPath, fullpathToExtension
+from helpers import fullpathToPath, fullpathToExtension, sortQueue
 import pacvert.config
 import helpers
 from pacvert.converter import Converter
@@ -178,4 +178,4 @@ class ScannedFile:
         """
         logger.debug("Setting "+self.fullpath+" from status "+helpers.statusToString(self.status).lower()+" to "+helpers.statusToString(newVal).lower())
         self.status = newVal
-        pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.added))
+        helpers.sortQueue()

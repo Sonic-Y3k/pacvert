@@ -658,6 +658,17 @@ def generateOutputFilename(filename):
     else: # if not just return
         return testname+testext
 
+def sortQueue():
+    """
+    Sort working queue.
+    """
+    try:
+        pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.added))
+    except:
+        #queue probably empty?
+        """
+        """
+
 def statusToString(status):
     """
     Translate a numeric status to a printable string
