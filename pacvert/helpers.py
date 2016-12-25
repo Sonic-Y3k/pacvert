@@ -668,6 +668,29 @@ def sortQueue():
         #queue probably empty?
         """
         """
+        
+def aspectMod(w,h):
+    """
+    Workaround:
+    Picture height must be an integer multiple of the specified chroma subsampling
+    """
+    wm = w % 4
+    hm = h % 4
+    if wm > 0 and wm <= 2:
+        wr = math.floor((w/4)*4)
+    elif wm > 0 and wm > 2:
+        wr = math.ceil((w/4)*4)
+    else:
+        wr = w
+    
+    if hm > 0 and hm <= 2:
+        hr = math.floor((h/4)*4)
+    elif hm > 0 and hm > 2:
+        hr = math.ceil((h/4)*4)
+    else:
+        hr = h
+
+    return [wr,hr]
 
 def statusToString(status):
     """

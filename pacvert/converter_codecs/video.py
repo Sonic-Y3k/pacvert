@@ -164,8 +164,11 @@ class VideoCodec(BaseCodec):
         ow, oh = w, h  # FIXED
         w, h, filters = self._aspect_corrections(sw, sh, w, h, mode)
 
-        safe['width'] = w
-        safe['height'] = h
+        #aspect fix for invalid mod
+        modDim = helpers.aspectMod(w,h)
+        
+        safe['width'] = modDim[0]
+        safe['height'] = modDim[1]
         safe['aspect_filters'] = filters
 
         if w and h:
