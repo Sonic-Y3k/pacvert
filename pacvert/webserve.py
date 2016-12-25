@@ -12,6 +12,8 @@ from cherrypy._cperror import NotFound
 from mako.lookup import TemplateLookup
 from mako import exceptions
 
+import json
+
 def serve_template(templatename, **kwargs):
     interface_dir = os.path.join(str(pacvert.PROG_DIR), 'data/interfaces/')
     template_dir = os.path.join(str(interface_dir), pacvert.CONFIG.INTERFACE)
@@ -60,3 +62,11 @@ class WebInterface(object):
         test = "Test1"
         queue = pacvert.WORKING_QUEUE
         return serve_template(templatename="home.html", title="Home", test=test, queue=queue)
+        
+    ##### update home #####
+    @cherrypy.expose
+    def update(self, **kwargs):
+        if len(pacvert.WORKING_QUEUE) > 0:
+            return json.dumps(pacvert.WORKING_QUEUE[0].getAsDict())
+        else:
+            return json.dumps([])

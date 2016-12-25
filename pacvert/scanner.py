@@ -179,3 +179,14 @@ class ScannedFile:
         logger.debug("Setting "+self.fullpath+" from status "+helpers.statusToString(self.status).lower()+" to "+helpers.statusToString(newVal).lower())
         self.status = newVal
         helpers.sortQueue()
+    
+    def getAsDict(self):
+        """
+        Returns Object as dict
+        """
+        dictR = {}
+        dictR['added'] = self.added
+        dictR['fullpath'] = self.fullpath
+        dictR['status'] = self.status
+        dictR['progress'] = self.progress
+        return dictR

@@ -94,6 +94,17 @@ def initialize(options):
             'tools.auth.on': False,
             'tools.sessions.on': False
         },
+        '/fonts': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': "interfaces/default/fonts",
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 24 * 30,  # 30 days
+            'tools.auth.on': False,
+            'tools.sessions.on': False
+        },
     }
 
     # Prevent time-outs
