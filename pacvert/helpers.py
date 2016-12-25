@@ -677,16 +677,16 @@ def aspectMod(w,h):
     wm = w % 4
     hm = h % 4
     if wm > 0 and wm <= 2:
-        wr = math.floor((w/4)*4)
+        wr = math.floor(w/4.0)*4
     elif wm > 0 and wm > 2:
-        wr = math.ceil((w/4)*4)
+        wr = math.ceil(w/4.0)*4
     else:
         wr = w
     
     if hm > 0 and hm <= 2:
-        hr = math.floor((h/4)*4)
+        hr = math.floor(h/4.0)*4
     elif hm > 0 and hm > 2:
-        hr = math.ceil((h/4)*4)
+        hr = math.ceil(h/4.0)*4
     else:
         hr = h
 
