@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from . import BaseCodec
+from pacvert.helpers import aspectMod
 
 
 class VideoCodec(BaseCodec):
