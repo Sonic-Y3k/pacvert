@@ -83,10 +83,9 @@ def run():
                 for timecode in conv:
                     logger.debug("Converting ("+str(timecode)+")...")
                     pacvert.WORKING_QUEUE[0].progress = timecode
-                pacvert.WORKING_QUEUE[0].updateStatus(3) # set status to finished
+                logger.info("Finished File: '"+pacvert.WORKING_QUEUE[0].fullpath+"'")
                 pacvert.WORKING_QUEUE[0].finished = now()
-                #pacvert.WORKING_QUEUE.pop(0) # remove file from working queue
-                logger.debug("Finished File")
+                pacvert.WORKING_QUEUE[0].updateStatus(3) # set status to finished
             except FFMpegConvertError as e:
                 logger.error("ffmpeg: " +e.message + " with command: "+ e.cmd)
                 pacvert.WORKING_QUEUE[0].updateStatus(4) # set status to failed

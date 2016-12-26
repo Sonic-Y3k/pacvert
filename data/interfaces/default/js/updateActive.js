@@ -42,7 +42,12 @@ function append_to_dom(data) {
             cell3.innerHTML = humanFileSize(parsedData[i-1].filesize);
             cell4.innerHTML = parsedData[i-1].status;
             
-            var diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].added));
+            var diff;
+            if (Date.parse(parsedData[i-1].finished) === 0) {
+                diff = Math.abs(Date.parse(parsedData[i-1].finished) - Date.parse(parsedData[i-1].added));
+            } else {
+                diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].added));
+            }
             var frameProgress = parseFloat(parsedData[i-1].progress)*parseFloat(parsedData[i-1].framecount);
             var fps = (parseFloat(frameProgress) / parseFloat(diff/100)).toFixed(2);
             

@@ -126,7 +126,7 @@ class ScannedFile:
     def __init__(self, fpath):
         try:
             self.added = now()
-            self.finished = -1
+            self.finished = 0
             self.fullpath = fpath
             self.mediainfo = MediaInfo.parse(self.fullpath)
             self.updateStatus(2)
