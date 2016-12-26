@@ -13,7 +13,7 @@ window.onload = function() {
 };
 </script>
 <div id="oval">
-		<table name="to_process">
+		<table name="to_process" id="to_process">
 		<thead>
 		<tr>
 			<th>Time added</th>
@@ -24,42 +24,6 @@ window.onload = function() {
 			<th>Progress</th>
 		</tr>
 		</thead>
-	% if len(queue) > 0:
-		% for row in queue:
-			% for track in row.mediainfo.tracks:
-				% if track.track_type == 'General':
-					<%
-						general = track
-					%>
-				% elif track.track_type == 'Video':
-					<%
-						video = track
-					%>
-				% elif track.track_type == 'Audio':
-					<%
-						audio = track
-					%>
-				% endif
-			% endfor
-			<tr>
-				<td>${row.added}</td>
-				<td>${helpers.fullpathToFilename(row.fullpath)}</td>
-				<td>${general.format}</td>
-				<td>${helpers.bytes_to_mb(general.file_size)}</td>
-				<td>${helpers.statusToString(row.status)}</td>
-				% if row.status == 0:
-				<td><div id="activeProgress">${row.progress}</div></td>
-				% else:
-				<td>${row.progress}</td>
-				% endif
-			</tr>
-
-		% endfor
-	% else:
-		<tr class="listelement">
-			<td colspan="6">No items in queue.</td>
-		</tr>
-	% endif
 	</table>
 </div>
 

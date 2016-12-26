@@ -65,8 +65,17 @@ class WebInterface(object):
         
     ##### update home #####
     @cherrypy.expose
-    def update(self, **kwargs):
+    def update(self, start=None, end=None):
+        try:
+            start = int(start)
+            end = int(end)
+        except TypeError:
+            start = 0
+            end = 20
+            
+        retValue = []
         if len(pacvert.WORKING_QUEUE) > 0:
-            return json.dumps(pacvert.WORKING_QUEUE[0].getAsDict())
-        else:
-            return json.dumps([])
+            for i in range(min(start, len(pacvert.WORKING_QUEUE)), min(len(pacvert.WORKING_QUEUE),end)):
+                retValue.append(pacvert.WORKING_QUEUE[i].getAsDict())
+            
+        return json.dumps(retValue)

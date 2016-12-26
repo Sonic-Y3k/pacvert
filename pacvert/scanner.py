@@ -7,9 +7,9 @@ from operator import itemgetter
 import pacvert
 import logger
 from pymediainfo import MediaInfo
-from helpers import fullpathToPath, fullpathToExtension, sortQueue
-import pacvert.config
 import helpers
+from helpers import now, fullpathToPath, fullpathToExtension, sortQueue, statusToString
+import pacvert.config
 from pacvert.converter import Converter
 from pacvert.converter_ffmpeg import FFMpegError, FFMpegConvertError
 
@@ -125,7 +125,7 @@ class ScannedFile:
     progress = 0.0
     def __init__(self, fpath):
         try:
-            self.added = helpers.now()
+            self.added = now()
             self.finished = -1
             self.fullpath = fpath
             self.mediainfo = MediaInfo.parse(self.fullpath)
@@ -179,7 +179,15 @@ class ScannedFile:
         Update status of scanned file and resort the queue.
         """
         logger.debug("Setting "+self.fullpath+" from status "+helpers.statusToString(self.status).lower()+" to "+helpers.statusToString(newVal).lower())
+        
+        # set status of element.
         self.status = newVal
+        
+        # delete original if successful transcoded and file deletion is enabled.
+        if newVal == 3:
+            self.deleteOriginal()
+            
+        # resort queue
         helpers.sortQueue()
     
     def getAsDict(self):
@@ -190,6 +198,22 @@ class ScannedFile:
         dictR['added'] = self.added
         dictR['finished'] = self.finished
         dictR['fullpath'] = self.fullpath
-        dictR['status'] = self.status
-        dictR['progress'] = self.progress
+        for track in self.mediainfo.tracks:
+            if track.track_type == 'General':
+                dictR['filesize'] = track.file_size
+                dictR['format'] = track.format
+            elif track.track_type == 'Video':
+                dictR['framecount'] = track.frame_count
+        dictR['status'] = statusToString(self.status)
+        dictR['progress'] = self.progress;
         return dictR
+    
+    def deleteOriginal(self):
+        """
+        Delete the original file. Should be used after successfully finnishing a file.
+        """
+        try:
+            logger.debug("Deleting file \'"+self.fullpath+"\'")
+            remove(self.fullpath)
+        except IOError:
+            logger.error("Deleting file \'"+self.fullpath+"\' failed.")
