@@ -37,7 +37,7 @@ function append_to_dom(data) {
                 cell5 = document.getElementById("process_row"+i+"c5");
             }
             cell0.innerHTML = parsedData[i-1].added;
-            cell1.innerHTML = parsedData[i-1].fullpath;
+            cell1.innerHTML = parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '');
             cell2.innerHTML = parsedData[i-1].format;
             cell3.innerHTML = humanFileSize(parsedData[i-1].filesize);
             cell4.innerHTML = parsedData[i-1].status;
