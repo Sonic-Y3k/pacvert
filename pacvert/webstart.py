@@ -86,8 +86,8 @@ def initialize(options):
         '/css': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': "interfaces/default/css",
-            'tools.caching.on': True,
-            'tools.caching.force': True,
+            'tools.caching.on': False,
+            'tools.caching.force': False,
             'tools.caching.delay': 0,
             'tools.expires.on': True,
             'tools.expires.secs': 60 * 60 * 24 * 30,  # 30 days
@@ -99,6 +99,17 @@ def initialize(options):
             'tools.staticdir.dir': "interfaces/default/fonts",
             'tools.caching.on': True,
             'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 24 * 30,  # 30 days
+            'tools.auth.on': False,
+            'tools.sessions.on': False
+        },
+        '/js': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': "interfaces/default/js",
+            'tools.caching.on': False,
+            'tools.caching.force': False,
             'tools.caching.delay': 0,
             'tools.expires.on': True,
             'tools.expires.secs': 60 * 60 * 24 * 30,  # 30 days

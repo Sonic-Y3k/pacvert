@@ -8,7 +8,7 @@ import time
 import pacvert.config
 from pacvert.converter import Converter
 from pacvert.converter_ffmpeg import FFMpegError, FFMpegConvertError
-from pacvert.helpers import cast_to_int, generateOutputFilename
+from pacvert.helpers import cast_to_int, generateOutputFilename, now
 
 c = Converter()
 
@@ -84,6 +84,7 @@ def run():
                     logger.debug("Converting ("+str(timecode)+")...")
                     pacvert.WORKING_QUEUE[0].progress = timecode
                 pacvert.WORKING_QUEUE[0].updateStatus(3) # set status to finished
+                pacvert.WORKING_QUEUE[0].finished = now()
                 #pacvert.WORKING_QUEUE.pop(0) # remove file from working queue
                 logger.debug("Finished File")
             except FFMpegConvertError as e:

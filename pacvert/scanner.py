@@ -108,6 +108,7 @@ class ScannedFile:
     Object that stores the path and mediainfo of file.
     """
     added = None
+    finished = None
     fullpath = None
     mediainfo = None
     crop = None
@@ -125,6 +126,7 @@ class ScannedFile:
     def __init__(self, fpath):
         try:
             self.added = helpers.now()
+            self.finished = -1
             self.fullpath = fpath
             self.mediainfo = MediaInfo.parse(self.fullpath)
             self.updateStatus(2)
@@ -186,6 +188,7 @@ class ScannedFile:
         """
         dictR = {}
         dictR['added'] = self.added
+        dictR['finished'] = self.finished
         dictR['fullpath'] = self.fullpath
         dictR['status'] = self.status
         dictR['progress'] = self.progress

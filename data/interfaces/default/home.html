@@ -5,6 +5,13 @@
 %>
 
 <%def name="body()">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="js/updateActive.js"></script>
+<script language="javascript">
+window.onload = function() {
+  doPoll();
+};
+</script>
 <div id="oval">
 		<table name="to_process">
 		<thead>
@@ -40,7 +47,11 @@
 				<td>${general.format}</td>
 				<td>${helpers.bytes_to_mb(general.file_size)}</td>
 				<td>${helpers.statusToString(row.status)}</td>
+				% if row.status == 0:
+				<td><div id="activeProgress">${row.progress}</div></td>
+				% else:
 				<td>${row.progress}</td>
+				% endif
 			</tr>
 
 		% endfor

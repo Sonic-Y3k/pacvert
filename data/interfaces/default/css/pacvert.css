@@ -3,11 +3,11 @@
     font-weight: 400;
     font-style: normal;
     font-stretch: normal;
-    src: url('fonts/SourceCodePro-Regular.eot') format('embedded-opentype'),
-         url('fonts/SourceCodePro-Regular.ttf.woff2') format('woff2'),
-         url('fonts/SourceCodePro-Regular.otf.woff') format('woff'),
-         url('fonts/SourceCodePro-Regular.otf') format('opentype'),
-         url('fonts/SourceCodePro-Regular.ttf') format('truetype');
+    src: url('../fonts/SourceCodePro-Regular.eot') format('embedded-opentype'),
+         url('../fonts/SourceCodePro-Regular.ttf.woff2') format('woff2'),
+         url('../fonts/SourceCodePro-Regular.otf.woff') format('woff'),
+         url('../fonts/SourceCodePro-Regular.otf') format('opentype'),
+         url('../fonts/SourceCodePro-Regular.ttf') format('truetype');
 }
 
 
