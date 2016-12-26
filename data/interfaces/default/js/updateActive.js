@@ -43,7 +43,7 @@ function append_to_dom(data) {
             cell4.innerHTML = parsedData[i-1].status;
             
             var diff;
-            if (Date.parse(parsedData[i-1].finished) === 0) {
+            if (Date.parse(parsedData[i-1].finished) !== 946681200000) {
                 diff = Math.abs(Date.parse(parsedData[i-1].finished) - Date.parse(parsedData[i-1].added));
             } else {
                 diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].added));
