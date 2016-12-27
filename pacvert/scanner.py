@@ -35,7 +35,7 @@ def add_file_to_queue(inputfile):
         and not is_file_in_queue(inputfile):
         newfile = ScannedFile(inputfile)
 
-        if len(newfile.mediainfo.tracks) > 1:
+        if len(newfile.mediainfo) >= 1:
             logger.info("New file: '"+inputfile+"'")
             pacvert.WORKING_QUEUE.append(newfile)
             pacvert.IGNORE_QUEUE.append(inputfile)
@@ -128,14 +128,28 @@ class ScannedFile:
             self.added = now()
             self.finished = 0
             self.fullpath = fpath
-            self.mediainfo = MediaInfo.parse(self.fullpath)
-            self.updateStatus(2)
+            
+            tempMediainfo = MediaInfo.parse(self.fullpath)
+            self.mediainfo = {}
+            for track in tempMediainfo.tracks:
+                if track.track_type not in self.mediainfo:
+                    self.mediainfo[track.track_type] = track.to_data()
+                else:
+                    if track.track_type in ['Audio', 'Subtitle']:
+                        if not isinstance(self.mediainfo[track.track_type], list):
+                            tempTrack = self.mediainfo[track.track_type]
+                            self.mediainfo[track.track_type] = []
+                            self.mediainfo[track.track_type].append(tempTrack)
+                        
+                        self.mediainfo[track.track_type].append(track.to_data())
+            
             self.createThumbs()
             self.crop = self.analyzeThumbs()
             self.deleteThumbs()
+            self.updateStatus(2)
         except Exception as e:
-            logger.error(e)
-
+            logger.error(e)            
+    
     def createThumbs(self):
         """
         Create thumbnails for crop-rectangle analysis
@@ -198,12 +212,15 @@ class ScannedFile:
         dictR['added'] = self.added
         dictR['finished'] = self.finished
         dictR['fullpath'] = self.fullpath
-        for track in self.mediainfo.tracks:
-            if track.track_type == 'General':
-                dictR['filesize'] = track.file_size
-                dictR['format'] = track.format
-            elif track.track_type == 'Video':
-                dictR['framecount'] = track.frame_count
+        dictR['mediainfo'] = { # just add neccessary things, keep the traffic low
+            'General': {
+                'format': self.mediainfo['General']['format'],
+                'file_size': self.mediainfo['General']['file_size']
+            },
+            'Video': {
+                'frame_count': self.mediainfo['Video']['frame_count']
+            }
+        }
         dictR['status'] = statusToString(self.status)
         dictR['progress'] = self.progress;
         return dictR

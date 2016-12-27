@@ -163,7 +163,7 @@ def main():
     try:
         queue_worker.start_thread()
     except:
-        logger.warn(u"Whaaaat?")
+        logger.error(u"Main thread did exit. Wtf.")
 
     # Force the http port if neccessary
     if args.port:

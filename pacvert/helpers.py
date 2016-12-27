@@ -622,21 +622,21 @@ def getFrameCountFromMediainfo(mediainfo):
     """
     Returns a total frame count if any.
     """
-    result = -1
-    for track in mediainfo.tracks:
-        if track.track_type == 'Video' and track.frame_count != None:
-            result = int(track.frame_count)
-    return result
+    if 'frame_count' in mediainfo['Video']:
+        return int(mediainfo['Video']['frame_count'])
+    else:
+        logger.debug('File has no frame count')
+        return -1
 
 def getFrameRateFromMediaInfo(mediainfo):
     """
     Teturns the framereate of the video file
     """
-    result = -1.0
-    for track in mediainfo.tracks:
-        if track.track_type == 'Video' and track.frame_rate != None:
-            result = float(track.frame_rate)
-    return result
+    if 'frame_rate' in mediainfo['Video']:
+        return float(mediainfo['Video']['frame_rate'])
+    else:
+        logger.debug("File has no frame rate")
+        return -1.0;
 
 def genChunks(a, n):
     """

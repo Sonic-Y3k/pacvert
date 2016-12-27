@@ -38,8 +38,8 @@ function append_to_dom(data) {
             }
             cell0.innerHTML = parsedData[i-1].added;
             cell1.innerHTML = parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '');
-            cell2.innerHTML = parsedData[i-1].format;
-            cell3.innerHTML = humanFileSize(parsedData[i-1].filesize);
+            cell2.innerHTML = parsedData[i-1].mediainfo['General'].format;
+            cell3.innerHTML = humanFileSize(parsedData[i-1].mediainfo['General'].file_size);
             cell4.innerHTML = parsedData[i-1].status;
             
             var diff;
@@ -48,13 +48,13 @@ function append_to_dom(data) {
             } else {
                 diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].added));
             }
-            var frameProgress = parseFloat(parsedData[i-1].progress)*parseFloat(parsedData[i-1].framecount);
+            var frameProgress = parseFloat(parsedData[i-1].progress)*parseFloat(parsedData[i-1].mediainfo['Video'].frame_count);
             var fps = (parseFloat(frameProgress) / parseFloat(diff/100)).toFixed(2);
             
             if (parsedData[i-1].status == "Finished") {
-                cell5.innerHTML = "100.00% (Ø"+fps+")";
+                cell5.innerHTML = "100.00% (Ø "+fps+" FPS)";
             } else {
-                cell5.innerHTML = (parsedData[i-1].progress*100).toFixed(3)+"% (Ø"+fps+" FPS)";
+                cell5.innerHTML = (parsedData[i-1].progress*100).toFixed(3)+"% (Ø "+fps+" FPS)";
             }
         }
     }

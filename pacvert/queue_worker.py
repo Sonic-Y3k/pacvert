@@ -39,10 +39,9 @@ def run():
                     video['tune'] = pacvert.CONFIG.CODEC_H264_TUNE # set tune
                     if pacvert.CONFIG.CODEC_H264_AUTOMAXRATE: # if automatic maxrate is enabled
                         if pacvert.CONFIG.CODEC_H264_BUFSIZE < 0 or pacvert.CONFIG.CODEC_H264_MAXRATE < 0:
-                            for track in pacvert.WORKING_QUEUE[0].mediainfo.tracks:
-                                if track.track_type == 'Video':
-                                    video['maxrate'] = cast_to_int(track.bit_rate) # set maxrate to video track bitrate
-                                    video['bufsize'] = cast_to_int(track.bit_rate*3) # set bufsize to three times the video bitrate
+                            if  'bit_rate' in pacvert.WORKING_QUEUE[0].mediainfo['Video']:
+                                video['maxrate'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
+                                video['bufsize'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
                         else:
                             video['maxrate'] = pacvert.CONFIG.CODEC_H264_MAXRATE # set maxrate to given value
                             video['bufsize'] = pacvert.CONFIG.CODEC_H264_BUFSIZE # set bufsize to given value
@@ -54,10 +53,9 @@ def run():
                     video['tune'] = pacvert.CONFIG.CODEC_HEVC_TUNE # set tune
                     if pacvert.CONFIG.CODEC_HEVC_AUTOMAXRATE: # set max rate
                         if pacvert.CONFIG.CODEC_HEVC_BUFSIZE < 0 or pacvert.CONFIG.CODEC_HEVC_MAXRATE < 0:
-                            for track in pacvert.WORKING_QUEUE[0].mediainfo.tracks:
-                                if track.track_type == 'Video':
-                                    video['maxrate'] = cast_to_int(track.bit_rate) # set maxrate to video track bitrate
-                                    video['bufsize'] = cast_to_int(track.bit_rate*3) # set bufsize to three times the video bitrate
+                            if  'bit_rate' in pacvert.WORKING_QUEUE[0].mediainfo['Video']:
+                                video['maxrate'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
+                                video['bufsize'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
                         else:
                             video['maxrate'] = pacvert.CONFIG.CODEC_HEVC_MAXRATE # set maxrate to given value
                             video['bufsize'] = pacvert.CONFIG.CODEC_HEVC_BUFSIZE # set bufsize to given value
