@@ -49,7 +49,7 @@ function append_to_dom(data) {
                 diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].added));
             }
             var frameProgress = parseFloat(parsedData[i-1].progress)*parseFloat(parsedData[i-1].mediainfo['Video'].frame_count);
-            var fps = (parseFloat(frameProgress) / parseFloat(diff/100)).toFixed(2);
+            var fps = (parseFloat(frameProgress) / parseFloat(diff/1000)).toFixed(2);
             
             if (parsedData[i-1].status == "Finished") {
                 cell5.innerHTML = "100.00% (Ø "+fps+" FPS)";
