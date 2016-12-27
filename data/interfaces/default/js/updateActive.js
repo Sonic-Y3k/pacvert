@@ -14,6 +14,7 @@ function append_to_dom(data) {
             if (row === null) {
                 row = table.insertRow(i);
                 row.id = "process_row" + i;
+                row.className = "listelement"
                 
                 cell0 = row.insertCell(0);
                 cell1 = row.insertCell(1);
