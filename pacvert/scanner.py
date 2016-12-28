@@ -49,7 +49,7 @@ def is_file_in_output_dir(inputfile):
     """
     Check if a given file is already in our output directory.
     """
-    if fullpathToPath(inputfile) == pacvert.CONFIG.OUTPUT_DIRECTORY:
+    if pacvert.CONFIG.OUTPUT_DIRECTORY in fullpathToPath(inputfile):
         logger.debug("File '"+inputfile+"' is in our output directory. It will be ignored.")
         pacvert.IGNORE_QUEUE.append(inputfile)
         return True
