@@ -66,7 +66,8 @@ def run():
                     video['threads'] = pacvert.CONFIG.CODEC_VP8_THREADS # set no of real cores
                 else:
                     logger.error("Codec not yet implemented")
-                conv = c.convert(pacvert.WORKING_QUEUE[0].fullpath, pacvert.CONFIG.OUTPUT_DIRECTORY+'/'+generateOutputFilename(pacvert.WORKING_QUEUE[0].fullpath),
+                
+                conv = c.convert(pacvert.WORKING_QUEUE[0].fullpath, pacvert.WORKING_QUEUE[0].outputfilename,
                 {
                     'format': 'mkv',
                     'video': video,

@@ -1,6 +1,6 @@
 #  This file is part of Pacvert.
 
-from os import path, stat, walk, remove
+from os import path, stat, walk, remove, rename
 from time import time
 from operator import itemgetter
 
@@ -8,7 +8,7 @@ import pacvert
 import logger
 from pymediainfo import MediaInfo
 import helpers
-from helpers import now, fullpathToPath, fullpathToExtension, sortQueue, statusToString
+from helpers import now, fullpathToPath, fullpathToExtension, sortQueue, statusToString, generateOutputFilename
 import pacvert.config
 from pacvert.converter import Converter
 from pacvert.converter_ffmpeg import FFMpegError, FFMpegConvertError
@@ -110,6 +110,7 @@ class ScannedFile:
     added = None
     finished = None
     fullpath = None
+    outputfilename = None
     mediainfo = None
     crop = None
     rename = None
@@ -144,6 +145,7 @@ class ScannedFile:
                         
                         self.mediainfo[track.track_type].append(track.to_data())
             
+            self.outputfilename = pacvert.CONFIG.OUTPUT_DIRECTORY+'/'+generateOutputFilename(self.fullpath)
             self.createThumbs()
             self.crop = self.analyzeThumbs()
             self.deleteThumbs()
@@ -201,6 +203,7 @@ class ScannedFile:
         # delete original if successful transcoded and file deletion is enabled.
         if newVal == 3:
             self.deleteOriginal()
+            self.performRename()
             
         # resort queue
         helpers.sortQueue()
@@ -210,6 +213,16 @@ class ScannedFile:
         """
         logger.info("Rename "+self.fullpath+" to "+newName)
         self.rename = newName
+    
+    def performRename(self):
+        """
+        """
+        if (self.rename is not None) and (self.status == 3):
+            try:
+                rename(self.outputfilename, pacvert.CONFIG.OUTPUT_DIRECTORY+'/'+generateOutputFilename(self.rename))
+                logger.debug("Renaming file \'"+self.fullpath+"\' to \'"+self.rename+"\' was successful.")
+            except IOError:
+                logger.error("Renaming file \'"+self.fullpath+"\' to \'"+self.rename+"\' failed.")
     
     def getAsDict(self):
         """
