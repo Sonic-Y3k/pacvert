@@ -28,7 +28,7 @@ function append_to_dom(data) {
             }
             cell0.innerHTML = parsedData[i-1].added;
             cell1.innerHTML = '<span class="open" id="open">'+parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '')+'</span>';
-            cell1.innerHTML += '<span id="open" class="open"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');" id="r'+i+'e"/></span>';
+            cell1.innerHTML += '<span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>';
             cell2.innerHTML = parsedData[i-1].mediainfo['General'].format;
             cell3.innerHTML = humanFileSize(parsedData[i-1].mediainfo['General'].file_size);
             cell4.innerHTML = parsedData[i-1].status;
@@ -64,12 +64,16 @@ function restoreBlur(id) {
 
 function removeBlur() {
     document.getElementById("editBox").style.visibility = 'hidden';
-    document.getElementById("oval").style = "border-radius: 15px;border: none;padding: 10px;width: calc(100% - 20px);height: auto ?;background-color: rgb(40,40,40);";
+    //document.getElementById("oval").style = "border-radius: 15px;border: none;padding: 10px;width: calc(100% - 20px);height: auto ?;background-color: rgb(40,40,40);";
+    document.getElementById("oval").style.filter = "none";
+    document.getElementById("oval").style.opacity = 1.0;
     document.getElementById("returnValue").innerHTML = "";
 }
 
 function editFileName(id, filename) {
-    document.getElementById("oval").style = "border-radius: 15px;border: none;padding: 10px;width: calc(100% - 20px);height: auto ?;background-color: rgb(40,40,40);-webkit-filter: blur(2px);-moz-filter: blur(2px);-o-filter: blur(2px);-ms-filter: blur(2px);filter: blur(2px);opacity: 0.4;";
+    document.getElementById("oval").style.filter = "blur(2px)";
+    document.getElementById("oval").style.opacity = 0.4;
+    //document.getElementById("oval").style = "border-radius: 15px;border: none;padding: 10px;width: calc(100% - 20px);height: auto ?;background-color: rgb(40,40,40);-webkit-filter: blur(2px);-moz-filter: blur(2px);-o-filter: blur(2px);-ms-filter: blur(2px);";
     document.getElementById("editBoxOriginalFilename").innerHTML = filename;
     document.getElementById("editBox").style.visibility = 'visible';
 
