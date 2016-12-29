@@ -14,31 +14,21 @@ function append_to_dom(data) {
             if (row === null) {
                 row = table.insertRow(i);
                 row.id = "process_row" + i;
-                row.className = "listelement"
+                row.className = "listelement";
                 
-                cell0 = row.insertCell(0);
-                cell1 = row.insertCell(1);
-                cell2 = row.insertCell(2);
-                cell3 = row.insertCell(3);
-                cell4 = row.insertCell(4);
-                cell5 = row.insertCell(5);
-                
-                cell0.id = "process_row"+i+"c0";
-                cell1.id = "process_row"+i+"c1";
-                cell2.id = "process_row"+i+"c2";
-                cell3.id = "process_row"+i+"c3";
-                cell4.id = "process_row"+i+"c4";
-                cell5.id = "process_row"+i+"c5";
+                for (var j = 0; j <= 5; j++) {
+                    eval('cell'+j+' = row.insertCell('+j+')');
+                    eval('cell'+j+'.classname = "col'+j+'"')
+                    eval('cell'+j+'.id = "process_row'+i+'c'+j+'"');
+                }
             } else {
-                cell0 = document.getElementById("process_row"+i+"c0");
-                cell1 = document.getElementById("process_row"+i+"c1");
-                cell2 = document.getElementById("process_row"+i+"c2");
-                cell3 = document.getElementById("process_row"+i+"c3");
-                cell4 = document.getElementById("process_row"+i+"c4");
-                cell5 = document.getElementById("process_row"+i+"c5");
+                for (var g = 0; g <= 5; g++) {
+                    eval('cell'+g+' = document.getElementById("process_row'+i+'c'+g+'")');
+                }
             }
             cell0.innerHTML = parsedData[i-1].added;
-            cell1.innerHTML = parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '');
+            cell1.innerHTML = '<span class="open" id="open">'+parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '')+'</span>';
+            cell1.innerHTML += '<span id="open" class="open"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');" id="r'+i+'e"/></span>';
             cell2.innerHTML = parsedData[i-1].mediainfo['General'].format;
             cell3.innerHTML = humanFileSize(parsedData[i-1].mediainfo['General'].file_size);
             cell4.innerHTML = parsedData[i-1].status;
@@ -59,6 +49,33 @@ function append_to_dom(data) {
             }
         }
     }
+}
+
+function restoreBlur(id) {
+    var newName = document.getElementById("editBoxNewFilename").value;
+    $.get( "update", { start: 0, end: 20, updateName: newName, updateID: id } ).done(function( data ) {
+        if (data == "OK.") {
+            removeBlur();
+        } else {
+            document.getElementById("returnValue").innerHTML = data;
+        }
+    });    
+}
+
+function removeBlur() {
+    document.getElementById("editBox").style.visibility = 'hidden';
+    document.getElementById("oval").style = "border-radius: 15px;border: none;padding: 10px;width: calc(100% - 20px);height: auto ?;background-color: rgb(40,40,40);";
+    document.getElementById("returnValue").innerHTML = "";
+}
+
+function editFileName(id, filename) {
+    document.getElementById("oval").style = "border-radius: 15px;border: none;padding: 10px;width: calc(100% - 20px);height: auto ?;background-color: rgb(40,40,40);-webkit-filter: blur(2px);-moz-filter: blur(2px);-o-filter: blur(2px);-ms-filter: blur(2px);filter: blur(2px);opacity: 0.4;";
+    document.getElementById("editBoxOriginalFilename").innerHTML = filename;
+    document.getElementById("editBox").style.visibility = 'visible';
+
+    document.getElementById("editBoxNewFilename").value = filename.replace(/^.*[\\\/]/, '');
+    document.getElementById("editBoxNewFilename").onclick = function() { document.getElementById("editBoxNewFilename").setSelectionRange(0, document.getElementById("editBoxNewFilename").value.length); };
+    document.getElementById("saveButton").onclick = function() { restoreBlur(id-1); };
 }
 
 function humanFileSize(bytes, si) {

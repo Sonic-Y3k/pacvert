@@ -31,6 +31,10 @@ th, td {
 	background-color: rgb(56,56,56);
 }
 
+.col0 {
+    max-width: 50px;
+}
+
 tr:nth-child(uneven) {
 	background-color: rgb(42,42,42);
 }
@@ -53,3 +57,26 @@ thead {
     height: auto ?;
     background-color: rgb(40,40,40);
 }
+
+h1 {
+    color: rgb(255,255,255);
+    font-family: 'Source Code Pro';
+}
+
+#editBox {
+    visibility: hidden;
+    position: absolute;
+    border-radius: 15px;
+    border-color: rgb(0,0,0);
+    border-style: solid;
+    border-width: 2px;
+    margin: 0 auto;
+    width: 600px;
+    height: 200px;
+    background-color: rgb(40,40,40);
+    top: 50%;
+    left: 50%;
+    padding: 5px;
+    margin: -100px 0 0 -300px;
+    z-index: 1000;
+    }

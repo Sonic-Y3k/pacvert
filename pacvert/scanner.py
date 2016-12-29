@@ -112,6 +112,7 @@ class ScannedFile:
     fullpath = None
     mediainfo = None
     crop = None
+    rename = None
 
     """
     Status variable:
@@ -204,6 +205,12 @@ class ScannedFile:
         # resort queue
         helpers.sortQueue()
     
+    def setRename(self, newName):
+        """
+        """
+        logger.info("Rename "+self.fullpath+" to "+newName)
+        self.rename = newName
+    
     def getAsDict(self):
         """
         Returns Object as dict
@@ -211,7 +218,10 @@ class ScannedFile:
         dictR = {}
         dictR['added'] = self.added
         dictR['finished'] = self.finished
-        dictR['fullpath'] = self.fullpath
+        if self.rename is not None:
+            dictR['fullpath'] = helpers.fullpathToPath(self.fullpath)+'/'+self.rename
+        else:
+            dictR['fullpath'] = self.fullpath
         dictR['mediainfo'] = { # just add neccessary things, keep the traffic low
             'General': {
                 'format': self.mediainfo['General']['format'],

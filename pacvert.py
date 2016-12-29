@@ -160,10 +160,10 @@ def main():
     # Start the background threads
     pacvert.start()
 
-    try:
-        queue_worker.start_thread()
-    except:
-        logger.error(u"Main thread did exit. Wtf.")
+    #try:
+    #    queue_worker.start_thread()
+    #except:
+    #    logger.error(u"Main thread did exit. Wtf.")
 
     # Force the http port if neccessary
     if args.port:

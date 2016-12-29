@@ -12,6 +12,8 @@ from cherrypy._cperror import NotFound
 from mako.lookup import TemplateLookup
 from mako import exceptions
 
+from helpers import sanitize, replace_illegal_chars
+
 import json
 
 def serve_template(templatename, **kwargs):
@@ -65,14 +67,25 @@ class WebInterface(object):
         
     ##### update home #####
     @cherrypy.expose
-    def update(self, start=None, end=None):
+    def update(self, start=None, end=None, updateName=None, updateID=None):
         try:
             start = int(start)
             end = int(end)
         except TypeError:
             start = 0
             end = 20
-            
+        
+        if not updateName is None:
+            try:
+                updateName = replace_illegal_chars(sanitize(str(updateName)))
+                if (len(updateName) < 2):
+                    return "Illegal character detected."
+                updateID = int(updateID)
+                pacvert.WORKING_QUEUE[start+updateID].setRename(updateName)
+                return "OK."
+            except ValueError:
+                logger.error("Can't update name of file.")         
+        
         retValue = []
         if len(pacvert.WORKING_QUEUE) > 0:
             for i in range(min(start, len(pacvert.WORKING_QUEUE)), min(len(pacvert.WORKING_QUEUE),end)):

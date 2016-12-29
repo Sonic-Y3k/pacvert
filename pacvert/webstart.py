@@ -90,7 +90,7 @@ def initialize(options):
             'tools.caching.force': False,
             'tools.caching.delay': 0,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 24 * 30,  # 30 days
+            'tools.expires.secs': 1,  # 1 second
             'tools.auth.on': False,
             'tools.sessions.on': False
         },
@@ -108,6 +108,17 @@ def initialize(options):
         '/js': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': "interfaces/default/js",
+            'tools.caching.on': False,
+            'tools.caching.force': False,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 1,  # 1 second
+            'tools.auth.on': False,
+            'tools.sessions.on': False
+        },
+        '/images': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': "interfaces/default/images",
             'tools.caching.on': False,
             'tools.caching.force': False,
             'tools.caching.delay': 0,

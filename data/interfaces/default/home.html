@@ -12,11 +12,27 @@ window.onload = function() {
   doPoll();
 };
 </script>
+<div id="editBox">
+	<h1>Edit Filename</h1>
+	<table>
+	<tr>
+		<td>Original File:</td>
+		<td id="editBoxOriginalFilename"></td>
+	</tr>
+	<tr>
+		<td>New filename:</td>
+		<td><input value="" style="width: 100%" id="editBoxNewFilename"></td>
+	</tr>
+	<tr>
+		<td colspan="2"><input type="button" value="Exit" id="exitButton" onclick="javascript:removeBlur();"> <input type="button" value="Save" id="saveButton"> <span id="returnValue" style="color:red"></span></td>
+	</tr>
+</table>
+</div>
 <div id="oval">
 		<table name="to_process" id="to_process">
 		<thead>
 		<tr>
-			<th>Time added</th>
+			<th class="col1">Time added</th>
 			<th>Filename</th>
 			<th>Format</th>
 			<th>Size</th>
