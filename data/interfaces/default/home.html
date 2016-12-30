@@ -41,6 +41,17 @@ window.onload = function() {
 		</tr>
 		</thead>
 	</table>
+	<input type="hidden" value="0" name="startval" id="startval">
+	<input type="hidden" value="19" name="endval" id="endval">
+	<table name="page_selection" id="page_selection">
+		<tr>
+			<td class="page_selector_text" id="page_selector_text">Showing 1 to 20 of ${queueLength} items.</td>
+			<td class="page_selector_td"><<</td>
+			<td class="page_selector_td" onclick="javascript:previousPage();"><</td>
+			<td class="page_selector_td" onclick="javascript:nextPage();">></td>
+			<td class="page_selector_td">>></td>
+		</tr>
+	</table>
 </div>
 
 </%def>

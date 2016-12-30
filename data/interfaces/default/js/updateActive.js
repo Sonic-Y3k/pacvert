@@ -1,5 +1,5 @@
 "use strict";
-
+var document;
 function append_to_dom(data) {
     var parsedData = JSON.parse(data);
     if (parsedData.length === 0) {
@@ -8,6 +8,12 @@ function append_to_dom(data) {
     
     var table = document.getElementById("to_process");
     if (table !== null) { //table element does exist
+        if (parsedData.length < table.rows.length) {
+            for (var h = parsedData.length+1; h < table.rows.length; h++) {
+            table.deleteRow(h);
+            }
+        }
+        
         for (var i = 1; i <= parsedData.length; i++) {
             var row = document.getElementById("process_row"+i);
             var cell0, cell1, cell2, cell3, cell4, cell5;
@@ -62,9 +68,57 @@ function restoreBlur(id) {
     });    
 }
 
+function getStartValue() {
+    return Number(document.getElementById("startval").value);
+}
+
+function getEndValue() {
+    return Number(document.getElementById("endval").value);
+}
+
+function getTotalValue() {
+    var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
+    return Number(splitText[5]);
+}
+
+function nextPage() {
+    var start = getStartValue()+20;
+    var totalMinimum = Math.min(Math.max(0, start), getTotalValue()-(getTotalValue() % 20));
+    
+    var totalMaximum;
+    if (totalMinimum === 0) {
+        totalMaximum = Math.min(19, getTotalValue());
+    } else {
+        totalMaximum = totalMinimum + 19;
+    }
+    
+    document.getElementById("startval").value = totalMinimum;
+    document.getElementById("endval").value = totalMaximum;  
+}
+
+function previousPage() {
+    var start = getStartValue()-20;
+    var totalMinimum = Math.max(0, start);
+    var totalMaximum;
+    if (totalMinimum === 0) {
+        totalMaximum = Math.min(19, getTotalValue());
+    } else {
+        totalMaximum = totalMinimum + 19;
+    }
+    
+    document.getElementById("startval").value = totalMinimum;
+    document.getElementById("endval").value = totalMaximum;
+}
+
+function updatePagePosition() {
+    var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
+    splitText[1] = getStartValue()+1;
+    splitText[3] = Math.min(getEndValue()+1, getTotalValue());
+    document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
+}
+
 function removeBlur() {
     document.getElementById("editBox").style.visibility = 'hidden';
-    //document.getElementById("oval").style = "border-radius: 15px;border: none;padding: 10px;width: calc(100% - 20px);height: auto ?;background-color: rgb(40,40,40);";
     document.getElementById("oval").style.filter = "none";
     document.getElementById("oval").style.opacity = 1.0;
     document.getElementById("returnValue").innerHTML = "";
@@ -73,7 +127,6 @@ function removeBlur() {
 function editFileName(id, filename) {
     document.getElementById("oval").style.filter = "blur(2px)";
     document.getElementById("oval").style.opacity = 0.4;
-    //document.getElementById("oval").style = "border-radius: 15px;border: none;padding: 10px;width: calc(100% - 20px);height: auto ?;background-color: rgb(40,40,40);-webkit-filter: blur(2px);-moz-filter: blur(2px);-o-filter: blur(2px);-ms-filter: blur(2px);";
     document.getElementById("editBoxOriginalFilename").innerHTML = filename;
     document.getElementById("editBox").style.visibility = 'visible';
 
@@ -98,13 +151,26 @@ function humanFileSize(bytes, si) {
     return bytes.toFixed(1)+' '+units[u];
 }
 
+function deleteRows() {
+    var table = document.getElementById("to_process");
+    var mod = (getEndValue() - getStartValue());
+    if (mod < table.rows.length && mod > 0)  {
+        for (var h=mod; h<table.rows.length; h++) {
+            table.deleteRow(h);
+        }
+
+    }
+      
+}
+
 function doPoll() {
-    $.ajax({
-        url: "update",
-        start: 0,
-        end: 20
+    $.get("update", {
+        start: getStartValue(),
+        end: getEndValue()
     }).done(function (data) {
         append_to_dom(data);
+        updatePagePosition();
+        deleteRows();
     }).always(function () {
         setTimeout(doPoll, 1000);
     })

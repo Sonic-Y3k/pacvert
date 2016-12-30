@@ -31,7 +31,7 @@ th, td {
 	background-color: rgb(56,56,56);
 }
 
-.col0 {
+#col0 {
     max-width: 50px;
 }
 
@@ -80,3 +80,16 @@ h1 {
     margin: -100px 0 0 -300px;
     z-index: 1000;
     }
+
+.page_selector_text {
+    width: calc(100% - 50px);
+}
+
+.page_selector_td {
+    width: 10px;
+    cursor: pointer;
+}
+
+.page_selector_td:hover {
+    background-color: rgb(50,50,50);
+}

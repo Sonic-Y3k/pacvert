@@ -61,9 +61,8 @@ class WebInterface(object):
     ##### home #####
     @cherrypy.expose
     def home(self, **kwargs):
-        test = "Test1"
-        queue = pacvert.WORKING_QUEUE
-        return serve_template(templatename="home.html", title="Home", test=test, queue=queue)
+        queueLength = len(pacvert.WORKING_QUEUE)
+        return serve_template(templatename="home.html", title="Home", queueLength=queueLength)
         
     ##### update home #####
     @cherrypy.expose
