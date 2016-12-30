@@ -9,16 +9,17 @@ function append_to_dom(data) {
     var table = document.getElementById("to_process");
     if (table !== null) { //table element does exist
         if (parsedData.length < table.rows.length) {
-            for (var h = parsedData.length+1; h < table.rows.length; h++) {
-            table.deleteRow(h);
-            }
+            //for (var h = parsedData.length+1; h < table.rows.length; h++) {
+            //    table.deleteRow(h);
+            //}
+            $("#to_process").find("tr:gt(0)").remove();
         }
         
         for (var i = 1; i <= parsedData.length; i++) {
             var row = document.getElementById("process_row"+i);
+            setTotalValue(parsedData[i-1].queuelength);
             var cell0, cell1, cell2, cell3, cell4, cell5;
             if (row === null) {
-                increaseTotalValue();
                 row = table.insertRow(i);
                 row.id = "process_row" + i;
                 row.className = "listelement";
@@ -82,9 +83,9 @@ function getTotalValue() {
     return Number(splitText[5]);
 }
 
-function increaseTotalValue() {
+function setTotalValue(newValue) {
     var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
-    splitText[5] = Number(splitText[5])+1;
+    splitText[5] = newValue;
     document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
 }
 
