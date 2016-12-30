@@ -18,6 +18,7 @@ function append_to_dom(data) {
             var row = document.getElementById("process_row"+i);
             var cell0, cell1, cell2, cell3, cell4, cell5;
             if (row === null) {
+                increaseTotalValue();
                 row = table.insertRow(i);
                 row.id = "process_row" + i;
                 row.className = "listelement";
@@ -79,6 +80,12 @@ function getEndValue() {
 function getTotalValue() {
     var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
     return Number(splitText[5]);
+}
+
+function increaseTotalValue() {
+    var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
+    splitText[5] = Number(splitText[5])+1;
+    document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
 }
 
 function nextPage() {
