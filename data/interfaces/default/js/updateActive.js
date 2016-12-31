@@ -64,7 +64,7 @@ function updateCell(row, id, content) {
 }
 
 function restoreBlur(id) {
-    var newName = document.getElementById("editBoxNewFilename").value;
+    var newName = document.getElementById("editBoxNewFilename").value.replace(/^.*[\\\/]/, '');
     $.get( "update", { start: 0, end: 20, updateName: newName, updateID: id } ).done(function( data ) {
         if (data == "OK.") {
             removeBlur();
