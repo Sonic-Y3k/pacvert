@@ -233,10 +233,8 @@ class ScannedFile:
         dictR = {}
         dictR['added'] = self.added
         dictR['finished'] = self.finished
-        if self.rename is not None:
-            dictR['fullpath'] = helpers.fullpathToPath(self.fullpath)+'/'+self.rename
-        else:
-            dictR['fullpath'] = self.fullpath
+        dictR['rename'] = self.rename
+        dictR['fullpath'] = self.fullpath
         dictR['mediainfo'] = { # just add neccessary things, keep the traffic low
             'General': {
                 'format': self.mediainfo['General']['format'],

@@ -9,37 +9,32 @@ function append_to_dom(data) {
     var table = document.getElementById("to_process");
     if (table !== null) { //table element does exist
         if (parsedData.length < table.rows.length) {
-            //for (var h = parsedData.length+1; h < table.rows.length; h++) {
-            //    table.deleteRow(h);
-            //}
             $("#to_process").find("tr:gt(0)").remove();
         }
         
         for (var i = 1; i <= parsedData.length; i++) {
             var row = document.getElementById("process_row"+i);
             setTotalValue(parsedData[i-1].queuelength);
-            var cell0, cell1, cell2, cell3, cell4, cell5;
             if (row === null) {
                 row = table.insertRow(i);
                 row.id = "process_row" + i;
                 row.className = "listelement";
                 
                 for (var j = 0; j <= 5; j++) {
-                    eval('cell'+j+' = row.insertCell('+j+')');
-                    eval('cell'+j+'.classname = "col'+j+'"')
-                    eval('cell'+j+'.id = "process_row'+i+'c'+j+'"');
-                }
-            } else {
-                for (var g = 0; g <= 5; g++) {
-                    eval('cell'+g+' = document.getElementById("process_row'+i+'c'+g+'")');
+                    var tempCell = row.insertCell(j);
+                    tempCell.classname = 'col'+j;
+                    tempCell.id = 'process_row'+i+'c'+j;
                 }
             }
-            cell0.innerHTML = parsedData[i-1].added;
-            cell1.innerHTML = '<span class="open" id="open">'+parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '')+'</span>';
-            cell1.innerHTML += '<span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>';
-            cell2.innerHTML = parsedData[i-1].mediainfo['General'].format;
-            cell3.innerHTML = humanFileSize(parsedData[i-1].mediainfo['General'].file_size);
-            cell4.innerHTML = parsedData[i-1].status;
+            updateCell(i, 0, parsedData[i-1].added);
+            if (parsedData[i-1].rename !== "") {
+                updateCell(i, 1, '<span class="open" id="open">'+parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '')+'</span><span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>');
+            } else {
+                updateCell(i, 1, '<span class="open" id="open">'+parsedData[i-1].rename.replace(/^.*[\\\/]/, '')+'</span><span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>');
+            }
+            updateCell(i, 2, parsedData[i-1].mediainfo.General.format);
+            updateCell(i, 3, humanFileSize(parsedData[i-1].mediainfo.General.file_size));
+            updateCell(i, 4, parsedData[i-1].status);
             
             var diff;
             if (Date.parse(parsedData[i-1].finished) !== 946681200000) {
@@ -47,14 +42,23 @@ function append_to_dom(data) {
             } else {
                 diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].timestarted));
             }
-            var frameProgress = parseFloat(parsedData[i-1].progress)*parseFloat(parsedData[i-1].mediainfo['Video'].frame_count);
+            var frameProgress = parseFloat(parsedData[i-1].progress)*parseFloat(parsedData[i-1].mediainfo.Video.frame_count);
             var fps = (parseFloat(frameProgress) / parseFloat(diff/1000)).toFixed(2);
             
             if (parsedData[i-1].status == "Finished") {
-                cell5.innerHTML = "100.00% (Ø "+fps+" FPS)";
+                updateCell(i, 5, "100.00% (Ø "+fps+" FPS)");
             } else {
-                cell5.innerHTML = (parsedData[i-1].progress*100).toFixed(3)+"% (Ø "+fps+" FPS)";
+                updateCell(i, 5, (parsedData[i-1].progress*100).toFixed(3)+"% (Ø "+fps+" FPS)");
             }
+        }
+    }
+}
+
+function updateCell(row, id, content) {
+    var cell = document.getElementById('process_row'+row+'c'+id);
+    if (cell !== null) {
+        if (cell.innerHTML != content) {
+            document.getElementById('process_row'+row+'c'+id).innerHTML = content;
         }
     }
 }
