@@ -43,9 +43,9 @@ function append_to_dom(data) {
             
             var diff;
             if (Date.parse(parsedData[i-1].finished) !== 946681200000) {
-                diff = Math.abs(Date.parse(parsedData[i-1].finished) - Date.parse(parsedData[i-1].added));
+                diff = Math.abs(Date.parse(parsedData[i-1].finished) - Date.parse(parsedData[i-1].timestarted));
             } else {
-                diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].added));
+                diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].timestarted));
             }
             var frameProgress = parseFloat(parsedData[i-1].progress)*parseFloat(parsedData[i-1].mediainfo['Video'].frame_count);
             var fps = (parseFloat(frameProgress) / parseFloat(diff/1000)).toFixed(2);

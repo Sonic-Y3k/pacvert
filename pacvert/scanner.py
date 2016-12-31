@@ -114,6 +114,7 @@ class ScannedFile:
     mediainfo = None
     crop = None
     rename = None
+    timestarted = 0
 
     """
     Status variable:
@@ -130,7 +131,6 @@ class ScannedFile:
             self.added = now()
             self.finished = 0
             self.fullpath = fpath
-            
             tempMediainfo = MediaInfo.parse(self.fullpath)
             self.mediainfo = {}
             for track in tempMediainfo.tracks:
@@ -200,10 +200,12 @@ class ScannedFile:
         # set status of element.
         self.status = newVal
         
-        # delete original if successful transcoded and file deletion is enabled.
-        if newVal == 3:
-            self.deleteOriginal()
-            self.performRename()
+        
+        if newVal == 0: # active
+            self.timestarted = now()
+        elif newVal == 3: # finished
+            self.deleteOriginal() # delete original if successful transcoded and file deletion is enabled.
+            self.performRename() # rename file if file was renamed via webinterface
             
         # resort queue
         helpers.sortQueue()
@@ -246,7 +248,8 @@ class ScannedFile:
         }
         dictR['queuelength'] = len(pacvert.WORKING_QUEUE)
         dictR['status'] = statusToString(self.status)
-        dictR['progress'] = self.progress;
+        dictR['progress'] = self.progress
+        dictR['timestarted'] = self.timestarted
         return dictR
     
     def deleteOriginal(self):
