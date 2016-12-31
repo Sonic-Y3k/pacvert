@@ -27,10 +27,10 @@ function append_to_dom(data) {
                 }
             }
             updateCell(i, 0, parsedData[i-1].added);
-            if (parsedData[i-1].rename !== "") {
+            if (parsedData[i-1].rename === null) {
                 updateCell(i, 1, '<span class="open" id="open">'+parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '')+'</span><span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>');
             } else {
-                updateCell(i, 1, '<span class="open" id="open">'+parsedData[i-1].rename.replace(/^.*[\\\/]/, '')+'</span><span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>');
+                updateCell(i, 1, '<span class="open" id="open">'+parsedData[i-1].rename+'</span><span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>');
             }
             updateCell(i, 2, parsedData[i-1].mediainfo.General.format);
             updateCell(i, 3, humanFileSize(parsedData[i-1].mediainfo.General.file_size));
