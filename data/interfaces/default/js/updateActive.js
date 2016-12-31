@@ -1,5 +1,19 @@
 "use strict";
 var document;
+
+document.addEventListener('keyup', function (){
+    if (document.getElementById("editBox").style.visibility != "hidden") {
+        if(event.keyCode === 13) { //Enter
+            var elem = document.getElementById("saveButton");
+            if (typeof elem.onclick == "function") {
+                elem.onclick.apply(elem);
+            }
+        } else if (event.keyCode === 27) { //Esc
+            removeBlur();
+        }
+    }
+});
+
 function append_to_dom(data) {
     var parsedData = JSON.parse(data);
     if (parsedData.length === 0) {
