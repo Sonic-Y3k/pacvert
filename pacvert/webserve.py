@@ -66,13 +66,32 @@ class WebInterface(object):
         
     ##### update home #####
     @cherrypy.expose
-    def update(self, start=None, end=None, updateName=None, updateID=None):
+    def update(self, start=None, end=None, updateName=None, updateID=None, up=None, down=None, remove=None):
         try:
             start = int(start)
             end = int(end)
         except TypeError:
             start = 0
             end = 20
+        
+        if not up is None:
+            up = int(up)
+            if up > 1:
+                pacvert.WORKING_QUEUE[up], pacvert.WORKING_QUEUE[up-1] = pacvert.WORKING_QUEUE[up-1], pacvert.WORKING_QUEUE[up]
+                return "OK."
+        
+        if not down is None:
+            down = int(down)
+            if down > 0:
+                pacvert.WORKING_QUEUE[down], pacvert.WORKING_QUEUE[down+1] = pacvert.WORKING_QUEUE[down+1], pacvert.WORKING_QUEUE[down]
+                return "OK."
+        
+        if not remove is None:
+            remove = int(remove)
+            if remove > 0:
+                pacvert.IGNORE_QUEUE.append(pacvert.WORKING_QUEUE[remove].fullpath)
+                del pacvert.WORKING_QUEUE[remove]
+                return "OK."
         
         if not updateName is None:
             try:

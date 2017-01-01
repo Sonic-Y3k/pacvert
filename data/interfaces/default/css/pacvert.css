@@ -25,6 +25,7 @@ th, td {
 	text-align: left;
 	padding: 8px;
 	color: rgb(226,226,226);
+    vertical-align: middle;
 }
 
 .listelement:hover {
@@ -92,4 +93,28 @@ h1 {
 
 .page_selector_td:hover {
     background-color: rgb(50,50,50);
+}
+
+div .arrows {
+    position: relative;
+    top: 0;
+    bottom: 0;
+}
+
+img .arrow_up {
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+img .arrow_down {
+    position: absolute;
+    top: 5px;
+    left: 0;
+}
+
+img .denied {
+    position: absolute;
+    top: 0px;
+    right: 0px;
 }

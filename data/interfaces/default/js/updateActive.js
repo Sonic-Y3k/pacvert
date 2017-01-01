@@ -34,7 +34,7 @@ function append_to_dom(data) {
                 row.id = "process_row" + i;
                 row.className = "listelement";
                 
-                for (var j = 0; j <= 5; j++) {
+                for (var j = 0; j <= 6; j++) {
                     var tempCell = row.insertCell(j);
                     tempCell.classname = 'col'+j;
                     tempCell.id = 'process_row'+i+'c'+j;
@@ -49,6 +49,10 @@ function append_to_dom(data) {
             updateCell(i, 2, parsedData[i-1].mediainfo.General.format);
             updateCell(i, 3, humanFileSize(parsedData[i-1].mediainfo.General.file_size));
             updateCell(i, 4, parsedData[i-1].status);
+            
+            if (parsedData[i-1].status != "Active") {
+                updateCell(i, 6, '<div class="arrows"><a href="javascript:moveDown('+i+')"><img src="../images/action_arrow_down.svg" class="arrow_down"></a><a href="javascript:moveUp('+i+')"><img src="../images/action_arrow_up.svg" class="arrow_up"></a><a href="javascript:remove('+i+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>');
+            }
             
             var diff;
             if (Date.parse(parsedData[i-1].finished) !== 946681200000) {
@@ -66,6 +70,18 @@ function append_to_dom(data) {
             }
         }
     }
+}
+
+function moveUp(id) {
+    $.get( "update", { up: id-1 } );
+}
+
+function moveDown(id) {
+    $.get ( "update", {down: id-1} );
+}
+
+function remove(id) {
+    $.get ( "update", {remove: id-1} );
 }
 
 function updateCell(row, id, content) {
