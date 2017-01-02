@@ -76,19 +76,19 @@ class WebInterface(object):
         
         if not up is None:
             up = int(up)
-            if up > 1:
+            if up > 1 and up < len(pacvert.WORKING_QUEUE):
                 pacvert.WORKING_QUEUE[up], pacvert.WORKING_QUEUE[up-1] = pacvert.WORKING_QUEUE[up-1], pacvert.WORKING_QUEUE[up]
                 return "OK."
         
         if not down is None:
             down = int(down)
-            if down > 0:
+            if down > 0 and down < len(pacvert.WORKING_QUEUE):
                 pacvert.WORKING_QUEUE[down], pacvert.WORKING_QUEUE[down+1] = pacvert.WORKING_QUEUE[down+1], pacvert.WORKING_QUEUE[down]
                 return "OK."
         
         if not remove is None:
             remove = int(remove)
-            if remove > 0:
+            if remove > 0 and remove < len(pacvert.WORKING_QUEUE):
                 pacvert.IGNORE_QUEUE.append(pacvert.WORKING_QUEUE[remove].fullpath)
                 del pacvert.WORKING_QUEUE[remove]
                 return "OK."

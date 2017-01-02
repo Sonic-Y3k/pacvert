@@ -41,11 +41,16 @@ function append_to_dom(data) {
                 }
             }
             updateCell(i, 0, parsedData[i-1].added);
+            var content;
             if (parsedData[i-1].rename === null) {
-                updateCell(i, 1, '<span class="open" id="open">'+parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '')+'</span><span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>');
+                content = parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '');
             } else {
-                updateCell(i, 1, '<span class="open" id="open">'+parsedData[i-1].rename+'</span><span id="open" class="open"><a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');"><img src="images/white_pencil.svg" width="10" align="right" style="cursor: pointer;" id="r'+i+'e" alt="Edit"/></a></span>');
+                content = parsedData[i-1].rename;
             }
+            content += '<a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');">';
+            content += '<img src="images/white_pencil.svg" class="editpencil" alt="Edit"/>';
+            content += '</a>';
+            updateCell(i, 1, content);
             updateCell(i, 2, parsedData[i-1].mediainfo.General.format);
             updateCell(i, 3, humanFileSize(parsedData[i-1].mediainfo.General.file_size));
             updateCell(i, 4, parsedData[i-1].status);
@@ -87,7 +92,7 @@ function remove(id) {
 function updateCell(row, id, content) {
     var cell = document.getElementById('process_row'+row+'c'+id);
     if (cell !== null) {
-        if (cell.innerHTML != content) {
+        if (cell.innerHTML.indexOf(content) === -1) {
             document.getElementById('process_row'+row+'c'+id).innerHTML = content;
         }
     }
@@ -155,7 +160,7 @@ function previousPage() {
 function updatePagePosition() {
     var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
     splitText[1] = getStartValue()+1;
-    splitText[3] = Math.min(getEndValue()+1, getTotalValue());
+    splitText[3] = Math.min(getEndValue(), getTotalValue());
     document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
 }
 

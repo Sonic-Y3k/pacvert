@@ -95,6 +95,15 @@ h1 {
     background-color: rgb(50,50,50);
 }
 
+.editpencil {
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    float: right;
+    margin: 0px;
+    padding: 0px;
+}
+
 div .arrows {
     position: relative;
     top: 0;
