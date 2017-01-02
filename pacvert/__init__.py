@@ -158,8 +158,10 @@ def initialize(config_file):
 
         # Get the currently installed version. Returns None, 'win32' or the git
         # hash.
-        CURRENT_VERSION, CONFIG.GIT_BRANCH = versioncheck.getVersion()
-
+        try:
+            CURRENT_VERSION, CONFIG.GIT_BRANCH = versioncheck.getVersion()
+        except TypeError as e:
+            logger.error("Something went terribly wrong by checking for the current version: "+str(e))
         # Write current version to a file, so we know which version did work.
         # This allowes one to restore to that version. The idea is that if we
         # arrive here, most parts of pacvert seem to work.
