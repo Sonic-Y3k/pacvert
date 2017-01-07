@@ -247,7 +247,6 @@ class ScannedFile:
                 'frame_count': self.mediainfo['Video']['frame_count']
             }
         }
-        dictR['queuelength'] = len(pacvert.WORKING_QUEUE)
         dictR['status'] = statusToString(self.status)
         dictR['progress'] = self.progress
         dictR['timestarted'] = self.timestarted

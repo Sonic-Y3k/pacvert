@@ -13,7 +13,7 @@ document.addEventListener('keyup', function (){
                 elem.onclick.apply(elem);
             }
         } else if (event.keyCode === 27) { //Esc
-            removeBlur();
+            hideEdit();
         }
     }
 });
@@ -39,6 +39,10 @@ function showFilter(evt, settingCat, num) {
     evt.currentTarget.className += " active";
 
     if (settingCat == "progress") { // only do this if displaying progress window
+        // Reset page selector
+        default_start = 0;
+        default_end = 20;
+    
         // Set the filter so that the right data is pulled
         default_status = num;
     
@@ -115,9 +119,11 @@ function pullData(once = false) {
             return;
         } else {
             var rowCounter = 0;
-            
             $.each(parsedData, function (index, value) { // iterate over every json value returned
-                updateTotalFiles(value.queuelength);
+                if (typeof value.queue_length !== 'undefined') {
+                    updateTotalFiles(value.queue_length);
+                    return false;
+                }
                 
                 var name = ((value.rename === null) ? value.fullpath.replace(/^.*[\\\/]/, '') : value.rename);
                 name += '<a href="#" onclick="javascript:editFileName('+value.id+',\''+value.fullpath+'\');">';

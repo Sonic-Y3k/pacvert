@@ -116,7 +116,8 @@ class WebInterface(object):
         if len(tempQueue) > 0:
             for i in range(min(start, len(tempQueue)), min(len(tempQueue),end)):
                 retValue.append(tempQueue[i].getAsDict())
-            
+        
+        retValue.append({'queue_length': len(tempQueue)})
         return json.dumps(retValue)
         
     @cherrypy.expose
