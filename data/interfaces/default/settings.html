@@ -1,0 +1,35 @@
+<%inherit file="base.html"/>
+
+<%def name="body()">
+<script src="js/settings.js" language="javascript"></script>
+<ul class="tab">
+    <li><a href="javascript:void(0);" class="tablinks" onclick="javascript:openSettings(event, 'General');" id="defaultOpen">General</a></li>
+    <li><a href="javascript:void(0);" class="tablinks" onclick="javascript:openSettings(event, 'DefaultCodec');">Codec</a></li>
+    <li><a href="javascript:void(0);" class="tablinks" onclick="javascript:openSettings(event, 'x264');">x264</a></li>
+    <li><a href="javascript:void(0);" class="tablinks" onclick="javascript:openSettings(event, 'x265');">x265</a></li>
+</ul>
+<div id="General" class="tabcontent">
+    <h3>General</h3>
+    <table id="table_general">
+    </table>
+</div>
+<div id="DefaultCodec" class="tabcontent">
+    <h3>Codec</h3>
+    <table id="table_codec">
+    </table>
+</div>
+<div id="x264" class="tabcontent">
+    <h3>x264</h3>
+    <table id="table_x264">
+    </table>
+</div>
+<div id="x265" class="tabcontent">
+    <h3>x265</h3>
+    <table id="table_x265">
+    </table>
+</div>
+<div class="settings_footer"><input type="button" value="Save..." onclick="javascript:saveConfigurableValues();" class="button"> <input type="hidden" value="Cancel" class="button"></div>
+<script>
+    document.getElementById("defaultOpen").click();
+</script>
+</%def>

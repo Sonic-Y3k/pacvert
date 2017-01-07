@@ -663,13 +663,30 @@ def sortQueue():
     Sort working queue.
     """
     try:
-        #pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.added))
-        pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status))
+        pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.finished))
+        #pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status))
     except:
         #queue probably empty?
         """
         """
+
+def getNewFileID():
+    """
+    Returns a new unique file id and increases the counter
+    """
+    pacvert.FILEID += 1
+    return pacvert.FILEID
+
+def returnQueueElementByFileID(fileid):
+    """
+    Returns a queue element by it's file id
+    """
+    for element in pacvert.WORKING_QUEUE:
+        if element.fileid == fileid:
+            return element
         
+    return None
+
 def aspectMod(w,h):
     """
     Workaround:

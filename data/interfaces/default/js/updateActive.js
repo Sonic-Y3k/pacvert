@@ -1,5 +1,9 @@
 "use strict";
 var document;
+var default_start = 0;
+var default_end = 20;
+var default_status = -1;
+var total_files = 0;
 
 document.addEventListener('keyup', function (){
     if (document.getElementById("editBox").style.visibility != "hidden") {
@@ -14,157 +18,185 @@ document.addEventListener('keyup', function (){
     }
 });
 
-function append_to_dom(data) {
-    var parsedData = JSON.parse(data);
-    if (parsedData.length === 0) {
-        return;
+function showFilter(evt, settingCat, num) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
     }
+
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the link that opened the tab
+    document.getElementById(settingCat).style.display = "block";
+    evt.currentTarget.className += " active";
+
+    if (settingCat == "progress") { // only do this if displaying progress window
+        // Set the filter so that the right data is pulled
+        default_status = num;
     
-    var table = document.getElementById("to_process");
-    if (table !== null) { //table element does exist
-        if (parsedData.length < table.rows.length) {
-            $("#to_process").find("tr:gt(0)").remove();
-        }
+        // Remove all entries from table
+        $("#table_progress").find("tr:gt(0)").remove();
         
-        for (var i = 1; i <= parsedData.length; i++) {
-            var row = document.getElementById("process_row"+i);
-            setTotalValue(parsedData[i-1].queuelength);
-            if (row === null) {
-                row = table.insertRow(i);
-                row.id = "process_row" + i;
-                row.className = "listelement";
-                
-                for (var j = 0; j <= 6; j++) {
-                    var tempCell = row.insertCell(j);
-                    tempCell.classname = 'col'+j;
-                    tempCell.id = 'process_row'+i+'c'+j;
-                }
-            }
-            updateCell(i, 0, parsedData[i-1].added);
-            var content;
-            if (parsedData[i-1].rename === null) {
-                content = parsedData[i-1].fullpath.replace(/^.*[\\\/]/, '');
-            } else {
-                content = parsedData[i-1].rename;
-            }
-            content += '<a href="#" onclick="javascript:editFileName('+i+',\''+parsedData[i-1].fullpath+'\');">';
-            content += '<img src="images/white_pencil.svg" class="editpencil" alt="Edit"/>';
-            content += '</a>';
-            updateCell(i, 1, content);
-            updateCell(i, 2, parsedData[i-1].mediainfo.General.format);
-            updateCell(i, 3, humanFileSize(parsedData[i-1].mediainfo.General.file_size));
-            updateCell(i, 4, parsedData[i-1].status);
-            
-            if (parsedData[i-1].status != "Active") {
-                updateCell(i, 6, '<div class="arrows"><a href="javascript:moveDown('+i+')"><img src="../images/action_arrow_down.svg" class="arrow_down"></a><a href="javascript:moveUp('+i+')"><img src="../images/action_arrow_up.svg" class="arrow_up"></a><a href="javascript:remove('+i+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>');
-            }
-            
-            var diff;
-            if (Date.parse(parsedData[i-1].finished) !== 946681200000) {
-                diff = Math.abs(Date.parse(parsedData[i-1].finished) - Date.parse(parsedData[i-1].timestarted));
-            } else {
-                diff = Math.abs(Date.now() - Date.parse(parsedData[i-1].timestarted));
-            }
-            var frameProgress = parseFloat(parsedData[i-1].progress)*parseFloat(parsedData[i-1].mediainfo.Video.frame_count);
-            var fps = (parseFloat(frameProgress) / parseFloat(diff/1000)).toFixed(2);
-            
-            if (parsedData[i-1].status == "Finished") {
-                updateCell(i, 5, "100.00% (Ø "+fps+" FPS)");
-            } else {
-                updateCell(i, 5, (parsedData[i-1].progress*100).toFixed(3)+"% (Ø "+fps+" FPS)");
-            }
-        }
+        // Get new data
+        pullData(true);
     }
 }
 
-function moveUp(id) {
-    $.get( "update", { up: id-1 } );
-}
-
-function moveDown(id) {
-    $.get ( "update", {down: id-1} );
-}
-
-function remove(id) {
-    $.get ( "update", {remove: id-1} );
-}
-
-function updateCell(row, id, content) {
-    var cell = document.getElementById('process_row'+row+'c'+id);
-    if (cell !== null) {
-        if (cell.innerHTML.indexOf(content) === -1) {
-            document.getElementById('process_row'+row+'c'+id).innerHTML = content;
-        }
-    }
-}
-
-function restoreBlur(id) {
-    var newName = document.getElementById("editBoxNewFilename").value.replace(/^.*[\\\/]/, '');
-    $.get( "update", { start: 0, end: 20, updateName: newName, updateID: id } ).done(function( data ) {
-        if (data == "OK.") {
-            removeBlur();
-        } else {
-            document.getElementById("returnValue").innerHTML = data;
-        }
-    });    
-}
-
-function getStartValue() {
-    return Number(document.getElementById("startval").value);
-}
-
-function getEndValue() {
-    return Number(document.getElementById("endval").value);
-}
-
-function getTotalValue() {
-    var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
-    return Number(splitText[5]);
-}
-
-function setTotalValue(newValue) {
-    var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
-    splitText[5] = newValue;
-    document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
+function firstPage() {
+    // Restore default value
+    default_start = 0;
+    default_end = 20;
+    
+    // Remove all entries from table
+    $("#table_progress").find("tr:gt(0)").remove();
+        
+    // Get new data
+    pullData(true);
 }
 
 function nextPage() {
-    var start = getStartValue()+20;
-    var totalMinimum = Math.min(Math.max(0, start), getTotalValue()-(getTotalValue() % 20));
-    
-    var totalMaximum;
-    if (totalMinimum === 0) {
-        totalMaximum = Math.min(19, getTotalValue());
-    } else {
-        totalMaximum = totalMinimum + 19;
+    if ((default_start+20) < total_files) {
+        // if possible increase values by 20
+        default_start += 20;
+        default_end += 20;
+        
+        // Remove all entries from table
+        $("#table_progress").find("tr:gt(0)").remove();
+        
+        // Get new data
+        pullData(true);
     }
-    
-    document.getElementById("startval").value = totalMinimum;
-    document.getElementById("endval").value = totalMaximum;  
 }
 
 function previousPage() {
-    var start = getStartValue()-20;
-    var totalMinimum = Math.max(0, start);
-    var totalMaximum;
-    if (totalMinimum === 0) {
-        totalMaximum = Math.min(19, getTotalValue());
-    } else {
-        totalMaximum = totalMinimum + 19;
+    if ((default_start-20) >= 0) {
+        // if possible decrease values by 20
+        default_start -= 20;
+        default_end -= 20;
+        
+        // Remove all entries from table
+        $("#table_progress").find("tr:gt(0)").remove();
+        
+        // Get new data
+        pullData(true);
     }
-    
-    document.getElementById("startval").value = totalMinimum;
-    document.getElementById("endval").value = totalMaximum;
 }
 
-function updatePagePosition() {
+function lastPage() {
+    while ((default_start+20) < total_files) {
+        // increase by 20 unitl we are on the last possible page
+        nextPage();
+    }
+}
+
+function updateTotalFiles(count) {
     var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
-    splitText[1] = getStartValue()+1;
-    splitText[3] = Math.min(getEndValue(), getTotalValue());
+    splitText[5] = count;
     document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
+    total_files = count;
 }
 
-function removeBlur() {
+function pullData(once = false) {
+    $.get("update", {
+        start: default_start,
+        end: default_end,
+        statusFilter: default_status
+    }).done(function (data) {
+        var parsedData = JSON.parse(data);
+        if (parsedData === 0) {
+            return;
+        } else {
+            var rowCounter = 0;
+            
+            $.each(parsedData, function (index, value) { // iterate over every json value returned
+                updateTotalFiles(value.queuelength);
+                
+                var name = ((value.rename === null) ? value.fullpath.replace(/^.*[\\\/]/, '') : value.rename);
+                name += '<a href="#" onclick="javascript:editFileName('+value.id+',\''+value.fullpath+'\');">';
+                name += '<img src="images/white_pencil.svg" class="editpencil" alt="Edit">';
+                name += '</a>';
+                
+                /*
+                This one is quite a little complicated...
+                
+                In timedifference we calculate either the difference between the time we started and the time we ended or the time between the time we started and the current time.
+                In frameprogress we calculate how many frames we should have archieved by percentage
+                In fps we calculate how many frames we are converting in one second
+                In progress we just print the values.
+                */
+                var timedifference = ((Date.parse(value.finished) !== 946681200000) ? Math.abs(Date.parse(value.finished) - Date.parse(value.timestarted)) : Math.abs(Date.now() - Date.parse(value.timestarted)) );
+                var frameProgress = parseFloat(value.progress)*parseFloat(value.mediainfo.Video.frame_count);
+                var fps = (parseFloat(frameProgress) / parseFloat(timedifference/1000)).toFixed(2);
+                var progress = ((value.status == "Finished") ? "100.00% (avg. "+fps+" FPS)" : (value.progress*100).toFixed(3)+" (avg. "+fps+" FPS)");
+                
+                var controls = "";
+                if ((value.status != "Active") && (value.status != "Finished")) {
+                    controls += '<div class="arrows"><a href="javascript:moveDown('+value.id+')"><img src="../images/action_arrow_down.svg" class="arrow_down"></a>';
+                    controls += '<a href="javascript:moveUp('+value.id+')"><img src="../images/action_arrow_up.svg" class="arrow_up"></a>';
+                    controls += '<a href="javascript:remove('+value.id+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>';
+                } else if (value.status == "Finished") {
+                    controls += '<div class="arrows"><a href="javascript:remove('+value.id+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>';
+                }
+                
+                var col = [ value.added,
+                            name,
+                            value.mediainfo.General.format,
+                            humanFileSize(value.mediainfo.General.file_size),
+                            value.status,
+                            progress,
+                            controls];
+                
+                if (rowCounter > ($('#table_progress tr').length-2)) {
+                    var styleclass = (rowCounter % 2 === 0) ? "listelement_even" : "listelement_odd";
+                    var row = "<tr id='tr_"+rowCounter+"' class='"+styleclass+"'><td class='col_timeadded'>"+col.join("</td><td>")+"</td></tr>"; 
+                    $('#table_progress').append(row);
+                } else {
+                    var cols = $('#tr_'+rowCounter).find("td");
+                    
+                    for (var i=0; i < col.length; i++) {
+                        if (cols.eq(i).html() != col[i]) {
+                            cols.eq(i).html(col[i]);
+                        }
+                    }
+                }
+                
+                rowCounter += 1;
+            });
+        }
+    }).always(function () {
+        if ( once === false ) {
+            setTimeout(pullData, 1000);
+        }
+    });
+}
+
+function moveUp(id) {
+    $.get( "update", { up: id } );
+}
+
+function moveDown(id) {
+    $.get ( "update", {down: id} );
+}
+
+function remove(id) {
+    $.get ( "update", {remove: id} );
+}
+
+function displayEdit() {
+    document.getElementById("oval").style.filter = "blur(2px)";
+    document.getElementById("oval").style.opacity = 0.4;
+    document.getElementById("editBox").style.visibility = 'visible';
+}
+
+function hideEdit() {
     document.getElementById("editBox").style.visibility = 'hidden';
     document.getElementById("oval").style.filter = "none";
     document.getElementById("oval").style.opacity = 1.0;
@@ -172,15 +204,25 @@ function removeBlur() {
 }
 
 function editFileName(id, filename) {
-    document.getElementById("oval").style.filter = "blur(2px)";
-    document.getElementById("oval").style.opacity = 0.4;
+    displayEdit();
+    
     document.getElementById("editBoxOriginalFilename").innerHTML = filename;
-    document.getElementById("editBox").style.visibility = 'visible';
-
     document.getElementById("editBoxNewFilename").value = filename.replace(/^.*[\\\/]/, '');
     document.getElementById("editBoxNewFilename").onclick = function() { document.getElementById("editBoxNewFilename").setSelectionRange(0, document.getElementById("editBoxNewFilename").value.length); };
-    document.getElementById("saveButton").onclick = function() { restoreBlur(id-1); };
+    document.getElementById("saveButton").onclick = function() { pushNewName(id); };
 }
+
+function pushNewName(id) {
+    var newName = document.getElementById("editBoxNewFilename").value.replace(/^.*[\\\/]/, '');
+    $.get( "update", { updateName: newName, updateID: id } ).done(function( data ) {
+        if (data == "OK.") {
+            hideEdit();
+        } else {
+            document.getElementById("returnValue").innerHTML = data;
+        }
+    });
+}
+
 
 function humanFileSize(bytes, si) {
     var thresh = si ? 1000 : 1024;
@@ -196,29 +238,4 @@ function humanFileSize(bytes, si) {
         ++u;
     } while(Math.abs(bytes) >= thresh && u < units.length - 1);
     return bytes.toFixed(1)+' '+units[u];
-}
-
-function deleteRows() {
-    var table = document.getElementById("to_process");
-    var mod = (getEndValue() - getStartValue());
-    if (mod < table.rows.length && mod > 0)  {
-        for (var h=mod; h<table.rows.length; h++) {
-            table.deleteRow(h);
-        }
-
-    }
-      
-}
-
-function doPoll() {
-    $.get("update", {
-        start: getStartValue(),
-        end: getEndValue()
-    }).done(function (data) {
-        append_to_dom(data);
-        updatePagePosition();
-        deleteRows();
-    }).always(function () {
-        setTimeout(doPoll, 1000);
-    })
 }

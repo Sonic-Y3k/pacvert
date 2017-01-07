@@ -28,21 +28,27 @@ th, td {
     vertical-align: middle;
 }
 
-.listelement:hover {
+.listelement_even {
+    background-color: rgb(47,47,47);
+}
+
+.listelement_odd {
+    background-color: rgb(42,42,42);
+}
+
+.listelement_even:hover {
 	background-color: rgb(56,56,56);
 }
 
-.col0 {
-    max-width: 50px;
+.listelement_odd:hover {
+	background-color: rgb(56,56,56);
 }
 
-tr:nth-child(uneven) {
-	background-color: rgb(42,42,42);
+.col_timeadded {
+    min-width: 70px;
+    max-width: 70px;
 }
 
-tr:nth-child(even) {
-	background-color: rgb(47,47,47);
-}
 
 thead {
 	vertical-align: middle;
@@ -51,12 +57,14 @@ thead {
 }
 
 #oval {
+    position: relative;
     border-radius: 15px;
     border: none;
     padding: 10px;
     width: calc(100% - 20px);
     height: auto ?;
     background-color: rgb(40,40,40);
+    top: 20px;
 }
 
 h1 {
@@ -92,7 +100,7 @@ h1 {
 }
 
 .page_selector_td:hover {
-    background-color: rgb(50,50,50);
+    background-color: rgb(56,56,56);
 }
 
 .editpencil {
@@ -104,26 +112,128 @@ h1 {
     padding: 0px;
 }
 
-div .arrows {
+.arrows {
     position: relative;
     top: 0;
     bottom: 0;
+    width: 26px;
+    right: 0px;
 }
 
-img .arrow_up {
+.arrow_up {
     position: relative;
     top: 0;
-    left: 0;
+    cursor: pointer;
 }
 
-img .arrow_down {
+.arrow_down {
     position: absolute;
     top: 5px;
-    left: 0;
+    cursor: pointer;
 }
 
-img .denied {
+.denied {
     position: absolute;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.settings_footer {
+    position: relative;
+    left: 0;
+    bottom: 0;
+    height: 50px;
+    width: 100%;
+    overflow:hidden;
+    text-align: center;
+    vertical-align: middle;
+}
+
+ul.tab {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: none;
+    background-color: rgb(42,42,42);
+}
+
+ul.tab li {
+    float: left;
+}
+
+ul.tab li a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+ul.tab li a:hover {
+    background-color: rgb(74,74,74);
+}
+
+ul.tab li a:focus, .active {
+    background-color: rgb(85,85,85);
+}
+
+input.button {
+    background-color: rgb(74,74,74);
+    width: 100px;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    vertical-align: middle;
+    height: 30px;
+    margin-top: 10px;
+}
+
+input.button:hover {
+    background-color: rgb(85,85,85);
+    cursor: pointer;
+}
+
+input.setting {
+    background-color: rgb(74,74,74);
+    color: rgb(255,255,255);
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgb(0,0,0);
+    width: calc(100% - 50px);
+}
+
+#header {
+    background-color: transparent;
+    position: absolute;
+    left: 0px;
+    width: 100%;
+    height: 25px;
     top: 0px;
-    right: 0px;
+    text-align: right;
+    color: rgb(255,255,255);
+}
+
+.settingcontent {
+    display: none;
+    padding: 6px 12px;
+    border: none;
+    border-top: none;
+    background-color: rgb(47,47,47);
+    color: white;
+}
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: none;
+    border-top: none;
+    background-color: rgb(47,47,47);
+    color: white;
 }

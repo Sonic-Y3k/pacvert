@@ -8,7 +8,7 @@ import pacvert
 import logger
 from pymediainfo import MediaInfo
 import helpers
-from helpers import now, fullpathToPath, fullpathToExtension, sortQueue, statusToString, generateOutputFilename
+from helpers import now, fullpathToPath, fullpathToExtension, sortQueue, statusToString, generateOutputFilename, getNewFileID
 import pacvert.config
 from pacvert.converter import Converter
 from pacvert.converter_ffmpeg import FFMpegError, FFMpegConvertError
@@ -107,6 +107,7 @@ class ScannedFile:
     """
     Object that stores the path and mediainfo of file.
     """
+    fileid = None
     added = None
     finished = None
     fullpath = None
@@ -131,6 +132,7 @@ class ScannedFile:
             self.added = now()
             self.finished = 0
             self.fullpath = fpath
+            self.fileid = getNewFileID()
             tempMediainfo = MediaInfo.parse(self.fullpath)
             self.mediainfo = {}
             for track in tempMediainfo.tracks:
@@ -231,6 +233,7 @@ class ScannedFile:
         Returns Object as dict
         """
         dictR = {}
+        dictR['id'] = self.fileid
         dictR['added'] = self.added
         dictR['finished'] = self.finished
         dictR['rename'] = self.rename

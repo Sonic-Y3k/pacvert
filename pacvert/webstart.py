@@ -18,6 +18,7 @@ def initialize(options):
     https_cert = options['https_cert']
     https_key = options['https_key']
 
+    enable_https = False
     if enable_https:
         # If either the HTTPS certificate or key do not exist, try to make self-signed ones.
         if pacvert.CONFIG.HTTPS_CREATE_CERT and \

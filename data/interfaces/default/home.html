@@ -1,15 +1,11 @@
 <%inherit file="base.html"/>
 
-<%!
-    from pacvert import helpers
-%>
-
 <%def name="body()">
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="js/updateActive.js"></script>
+<script src="js/settings.js" language="javascript"></script>
 <script language="javascript">
 window.onload = function() {
-  doPoll();
+  pullData();
 };
 </script>
 <div id="editBox">
@@ -24,35 +20,75 @@ window.onload = function() {
 		<td><input value="" style="width: 100%" id="editBoxNewFilename"></td>
 	</tr>
 	<tr>
-		<td colspan="2"><input type="button" value="Exit" id="exitButton" onclick="javascript:removeBlur();"> <input type="button" value="Save" id="saveButton"> <span id="returnValue" style="color:red"></span></td>
+		<td colspan="2"><input type="button" value="Exit" id="exitButton" onclick="javascript:hideEdit();" class="button"> <input class="button" type="button" value="Save" id="saveButton"> <span id="returnValue" style="color:red"></span></td>
 	</tr>
 </table>
 </div>
 <div id="oval">
-		<table name="to_process" id="to_process">
-		<thead>
-		<tr>
-			<th class="col1">Time added</th>
-			<th>Filename</th>
-			<th>Format</th>
-			<th>Size</th>
-			<th>Status</th>
-			<th>Progress</th>
-			<th>Controls</th>
-		</tr>
+	<ul class="tab">
+		<li><a href="javascript:void(0);" class="tablinks" id="view_all" onclick="javascript:showFilter(event, 'progress', -1)">All</a></li>
+		<li><a href="javascript:void(0);" class="tablinks" id="view_active" onclick="javascript:showFilter(event, 'progress', 0)">Active</a></li>
+		<li><a href="javascript:void(0);" class="tablinks" id="view_pending" onclick="javascript:showFilter(event, 'progress', 2)">Pending</a></li>
+		<li><a href="javascript:void(0);" class="tablinks" id="view_finished" onclick="javascript:showFilter(event, 'progress', 3)">Finished</a></li>
+		<li><a href="javascript:void(0);" class="tablinks" id="view_failed" onclick="javascript:showFilter(event, 'progress', 4)">Failed</a></li>
+		<li><a href="javascript:void(0);" class="tablinks" id="view_settings" onclick="javascript:showFilter(event, 'settings', 0)"><img src="../images/settings.svg" width="20px" height="20px" alt="Settings"></a></li>
+	</ul>
+	<div id="progress" class="tabcontent">
+		<table id="table_progress">
+			<thead>
+			<tr>
+				<th class="col_timeadded">Time added</th>
+				<th>Filename</th>
+				<th>Format</th>
+				<th>Size</th>
+				<th>Status</th>
+				<th>Progress</th>
+				<th>Controls</th>
+			</tr>
 		</thead>
-	</table>
-	<input type="hidden" value="0" name="startval" id="startval">
-	<input type="hidden" value="19" name="endval" id="endval">
-	<table name="page_selection" id="page_selection">
+		</table>
+		<table name="page_selection" id="page_selection">
 		<tr>
 			<td class="page_selector_text" id="page_selector_text">Showing 1 to 20 of ${queueLength} items.</td>
-			<td class="page_selector_td"><<</td>
+			<td class="page_selector_td" onclick="javascript:firstPage()"><<</td>
 			<td class="page_selector_td" onclick="javascript:previousPage();"><</td>
 			<td class="page_selector_td" onclick="javascript:nextPage();">></td>
-			<td class="page_selector_td">>></td>
+			<td class="page_selector_td" onclick="javascript:lastPage();">>></td>
 		</tr>
 	</table>
+	</div>
+	<div id="settings" class="tabcontent">
+		<ul class="tab">
+			<li><a href="javascript:void(0);" class="settinglinks" onclick="javascript:openSettings(event, 'General');" id="defaultOpen">General</a></li>
+			<li><a href="javascript:void(0);" class="settinglinks" onclick="javascript:openSettings(event, 'DefaultCodec');">Codec</a></li>
+			<li><a href="javascript:void(0);" class="settinglinks" onclick="javascript:openSettings(event, 'x264');">x264</a></li>
+			<li><a href="javascript:void(0);" class="settinglinks" onclick="javascript:openSettings(event, 'x265');">x265</a></li>
+	</ul>
+	<div id="General" class="settingcontent">
+			<h3>General</h3>
+			<table id="table_general">
+			</table>
+	</div>
+	<div id="DefaultCodec" class="settingcontent">
+			<h3>Codec</h3>
+			<table id="table_codec">
+			</table>
+	</div>
+	<div id="x264" class="settingcontent">
+			<h3>x264</h3>
+			<table id="table_x264">
+			</table>
+	</div>
+	<div id="x265" class="settingcontent">
+			<h3>x265</h3>
+			<table id="table_x265">
+			</table>
+	</div>
+	<div class="settings_footer"><input type="button" value="Save..." onclick="javascript:saveConfigurableValues();" class="button"> <input type="hidden" value="Cancel" class="button"></div>
+	</div>
 </div>
-
+<script>
+    document.getElementById("view_all").click();
+		document.getElementById("defaultOpen").click();
+</script>
 </%def>

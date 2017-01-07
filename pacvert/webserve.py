@@ -12,7 +12,8 @@ from cherrypy._cperror import NotFound
 from mako.lookup import TemplateLookup
 from mako import exceptions
 
-from helpers import sanitize, replace_illegal_chars
+from helpers import sanitize, replace_illegal_chars, returnQueueElementByFileID
+from config import _CONFIG_DEFINITIONS
 
 import json
 
@@ -43,14 +44,12 @@ class WebInterface(object):
         if pacvert.CONFIG.FIRST_RUN_COMPLETE:
             raise cherrypy.HTTPRedirect(pacvert.HTTP_ROOT + "home")
         else:
-            raise cherrypy.HTTPRedirect(pacvert.HTTP_ROOT + "welcome")
+            raise cherrypy.HTTPRedirect(pacvert.HTTP_ROOT + "home")
+            
 
     ##### Welcome #####
     @cherrypy.expose
     def welcome(self, **kwargs):
-        config = {
-        }
-
         # The setup wizard just refreshes the page on submit so we must redirect to home if config set.
         if pacvert.CONFIG.FIRST_RUN_COMPLETE:
             pacvert.initialize_scheduler()
@@ -66,29 +65,31 @@ class WebInterface(object):
         
     ##### update home #####
     @cherrypy.expose
-    def update(self, start=None, end=None, updateName=None, updateID=None, up=None, down=None, remove=None):
+    def update(self, start=None, end=None, statusFilter=None, updateName=None, updateID=None, up=None, down=None, remove=None):
         try:
             start = int(start)
             end = int(end)
+            statusFilter = int(statusFilter)
         except TypeError:
             start = 0
             end = 20
+            statusFilter = -1
         
         if not up is None:
-            up = int(up)
+            up = pacvert.WORKING_QUEUE.index(returnQueueElementByFileID(int(up)))
             if up > 1 and up < len(pacvert.WORKING_QUEUE):
                 pacvert.WORKING_QUEUE[up], pacvert.WORKING_QUEUE[up-1] = pacvert.WORKING_QUEUE[up-1], pacvert.WORKING_QUEUE[up]
                 return "OK."
         
         if not down is None:
-            down = int(down)
+            down = pacvert.WORKING_QUEUE.index(returnQueueElementByFileID(int(down)))
             if down > 0 and down < len(pacvert.WORKING_QUEUE):
                 pacvert.WORKING_QUEUE[down], pacvert.WORKING_QUEUE[down+1] = pacvert.WORKING_QUEUE[down+1], pacvert.WORKING_QUEUE[down]
                 return "OK."
         
         if not remove is None:
-            remove = int(remove)
-            if remove > 0 and remove < len(pacvert.WORKING_QUEUE):
+            remove = pacvert.WORKING_QUEUE.index(returnQueueElementByFileID(int(remove)))
+            if remove >= 0 and remove < len(pacvert.WORKING_QUEUE):
                 pacvert.IGNORE_QUEUE.append(pacvert.WORKING_QUEUE[remove].fullpath)
                 del pacvert.WORKING_QUEUE[remove]
                 return "OK."
@@ -99,14 +100,65 @@ class WebInterface(object):
                 if (len(updateName) < 2):
                     return "Illegal character detected."
                 updateID = int(updateID)
-                pacvert.WORKING_QUEUE[start+updateID].setRename(updateName)
+                returnQueueElementByFileID(updateID).setRename(updateName)
                 return "OK."
             except ValueError:
                 logger.error("Can't update name of file.")         
         
         retValue = []
-        if len(pacvert.WORKING_QUEUE) > 0:
-            for i in range(min(start, len(pacvert.WORKING_QUEUE)), min(len(pacvert.WORKING_QUEUE),end)):
-                retValue.append(pacvert.WORKING_QUEUE[i].getAsDict())
+        tempQueue = []
+        for i in pacvert.WORKING_QUEUE:
+            if statusFilter >= 0:
+                if i.status == statusFilter:
+                    tempQueue.append(i)
+            else:
+                tempQueue.append(i)
+        if len(tempQueue) > 0:
+            for i in range(min(start, len(tempQueue)), min(len(tempQueue),end)):
+                retValue.append(tempQueue[i].getAsDict())
             
         return json.dumps(retValue)
+        
+    @cherrypy.expose
+    def settings(self, getConfigVal=None, paramName=None, paramVal=None):
+        if (not paramName is None) and (not paramVal is None):
+            try:
+                if not str(pacvert.CONFIG.__getattr__(paramName)) is paramVal:
+                    if type(_CONFIG_DEFINITIONS[paramName][2]) is dict:
+                        result = {}
+                        if len(paramVal) > 0:
+                            firstSplit = str(paramVal).split(",")
+                            for elem in firstSplit:
+                                secondSplit = elem.split(":")
+                                result[secondSplit[0]] = str(secondSplit[1])                            
+                            pacvert.CONFIG.__setattr__(paramName, result)
+                    elif type(_CONFIG_DEFINITIONS[paramName][2]) is list:
+                        pacvert.CONFIG.__setattr__(paramName, paramVal.split(","))
+                    else:
+                        pacvert.CONFIG.__setattr__(paramName, paramVal)
+                pacvert.CONFIG.FIRST_RUN_COMPLETE = True
+                return "OK."
+            except:
+                 return "Nope."
+        if not getConfigVal is None:
+            tempConfig = {'General': {}, 'CodecSettings': {}, 'Advanced': {}}
+            for element in _CONFIG_DEFINITIONS:
+                if type(_CONFIG_DEFINITIONS[element][2]) is str:
+                    thistype = "str"
+                elif type(_CONFIG_DEFINITIONS[element][2]) is int:
+                    thistype = "int"
+                elif type(_CONFIG_DEFINITIONS[element][2]) is float:
+                    thistype = "float"
+                elif type(_CONFIG_DEFINITIONS[element][2]) is dict:
+                    thistype = "dict"
+                elif type(_CONFIG_DEFINITIONS[element][2]) is bool:
+                    thistype = "bool"
+                elif type(_CONFIG_DEFINITIONS[element][2]) is list:
+                    thistype = "list"
+                else:
+                    thistype = "unknown"
+                tempConfig[_CONFIG_DEFINITIONS[element][1]][element] = {'value': pacvert.CONFIG.__getattr__(element), 'type': thistype}
+                    
+
+            return json.dumps(tempConfig)
+        return "Nope."#serve_template(templatename="settings.html", title="Settings")
