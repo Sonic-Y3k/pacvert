@@ -33,20 +33,20 @@ def run():
                     video['mode'] = 'crop' # set crop mode
                     
                 if pacvert.CONFIG.DEFAULT_CODEC_VIDEO == "h264": # if target codec is h264
-                    video['preset'] = pacvert.CONFIG.CODEC_H264_PRESET # set preset
-                    video['profile'] = pacvert.CONFIG.CODEC_H264_PROFILE # set profile
-                    video['quality'] = pacvert.CONFIG.CODEC_H264_QUALITY # set quality
-                    video['tune'] = pacvert.CONFIG.CODEC_H264_TUNE # set tune
-                    if pacvert.CONFIG.CODEC_H264_AUTOMAXRATE: # if automatic maxrate is enabled
-                        if pacvert.CONFIG.CODEC_H264_BUFSIZE < 0 or pacvert.CONFIG.CODEC_H264_MAXRATE < 0:
+                    video['preset'] = pacvert.CONFIG.CODEC_AVC_PRESET # set preset
+                    video['profile'] = pacvert.CONFIG.CODEC_AVC_PROFILE # set profile
+                    video['quality'] = pacvert.CONFIG.CODEC_AVC_QUALITY # set quality
+                    video['tune'] = pacvert.CONFIG.CODEC_AVC_TUNE # set tune
+                    if pacvert.CONFIG.CODEC_AVC_AUTOMAXRATE: # if automatic maxrate is enabled
+                        if pacvert.CONFIG.CODEC_AVC_BUFSIZE < 0 or pacvert.CONFIG.CODEC_H264_MAXRATE < 0:
                             if  'bit_rate' in pacvert.WORKING_QUEUE[0].mediainfo['Video']:
                                 video['maxrate'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
                                 video['bufsize'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
                         else:
-                            video['maxrate'] = pacvert.CONFIG.CODEC_H264_MAXRATE # set maxrate to given value
-                            video['bufsize'] = pacvert.CONFIG.CODEC_H264_BUFSIZE # set bufsize to given value
-                    for anotheropt in pacvert.CONFIG.CODEC_H264_ADDITIONALOPT: # if additional options are specified
-                        video[anotheropt] = pacvert.CONFIG.CODEC_H264_ADDITIONALOPT[anotheropt] # add options to out encoding list
+                            video['maxrate'] = pacvert.CONFIG.CODEC_AVC_MAXRATE # set maxrate to given value
+                            video['bufsize'] = pacvert.CONFIG.CODEC_AVC_BUFSIZE # set bufsize to given value
+                    for anotheropt in pacvert.CONFIG.CODEC_AVC_ADDITIONALOPT: # if additional options are specified
+                        video[anotheropt] = pacvert.CONFIG.CODEC_AVC_ADDITIONALOPT[anotheropt] # add options to out encoding list
                 elif pacvert.CONFIG.DEFAULT_CODEC_VIDEO == "hevc": # if target codec is hevc
                     video['preset'] = pacvert.CONFIG.CODEC_HEVC_PRESET # set preset
                     video['quality'] = pacvert.CONFIG.CODEC_HEVC_QUALITY # set quality

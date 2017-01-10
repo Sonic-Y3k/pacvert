@@ -55,7 +55,7 @@ function fillSettings(name, content) {
             fillSettingDiv(name, type, value, "General"); // add a setting to general div
         } else if (name.indexOf("DEFAULT_CODEC") !== -1) { 
             fillSettingDiv(name, type, value, "Codec"); // add a setting to default codec div
-        } else if ((name.indexOf("CODEC_") !== -1) && (name.indexOf("H264") !== -1)) {
+        } else if ((name.indexOf("CODEC_") !== -1) && (name.indexOf("AVC") !== -1)) {
             fillSettingDiv(name, type, value, "x264"); // add a setting to x264 div
         } else if ((name.indexOf("CODEC_") !== -1) && (name.indexOf("HEVC") !== -1)) {
             fillSettingDiv(name, type, value, "x265"); // add a setting to x265 div
