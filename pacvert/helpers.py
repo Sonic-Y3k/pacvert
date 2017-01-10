@@ -663,7 +663,9 @@ def sortQueue():
     Sort working queue.
     """
     try:
+        pacvert.RESORT = True
         pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.finished))
+        pacvert.RESORT = False
         #pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status))
     except:
         #queue probably empty?

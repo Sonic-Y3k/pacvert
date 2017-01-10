@@ -21,6 +21,8 @@ def scan():
     for root,dirnames,filenames in walk(pacvert.CONFIG.SCAN_DIRECTORIES_PATH):
         for filename in filenames:
             if not is_file_ignored(path.join(root,filename)):
+                while pacvert.RESORT:
+                    time.sleep(1)
                 add_file_to_queue(path.join(root,filename))
 
 def add_file_to_queue(inputfile):

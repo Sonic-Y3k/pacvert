@@ -72,6 +72,7 @@ DEV = False
 WORKING_QUEUE = []
 IGNORE_QUEUE = []
 FILEID = -1
+RESORT = False
 
 def initialize(config_file):
     with INIT_LOCK:
