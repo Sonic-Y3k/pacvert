@@ -12,7 +12,7 @@ from cherrypy._cperror import NotFound
 from mako.lookup import TemplateLookup
 from mako import exceptions
 
-from helpers import sanitize, replace_illegal_chars, returnQueueElementByFileID
+from helpers import sanitize, replace_illegal_chars, returnQueueElementByFileID, cast_to_float, cast_to_int
 from config import _CONFIG_DEFINITIONS
 
 import json
@@ -135,6 +135,10 @@ class WebInterface(object):
                             pacvert.CONFIG.__setattr__(paramName, result)
                     elif type(_CONFIG_DEFINITIONS[paramName][2]) is list:
                         pacvert.CONFIG.__setattr__(paramName, paramVal.split(","))
+                    elif type(_CONFIG_DEFINITIONS[paramName][2]) is float:
+                        pacvert.CONFIG.__setattr__(paramName, cast_to_float(paramVal))
+                    elif type(_CONFIG_DEFINITIONS[paramName][2]) is int:
+                        pacvert.CONFIG.__setattr__(paramName, cast_to_int(paramVal))
                     else:
                         pacvert.CONFIG.__setattr__(paramName, paramVal)
                 pacvert.CONFIG.FIRST_RUN_COMPLETE = True
