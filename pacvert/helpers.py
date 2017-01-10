@@ -18,6 +18,7 @@ import unicodedata
 import urllib, urllib2
 from xml.dom import minidom
 import xmltodict
+from operator import attrgetter
 
 import pacvert
 import logger
@@ -665,9 +666,9 @@ def sortQueue():
     if not pacvert.RESORT:
         try:
             pacvert.RESORT = True
-            pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.finished))
+            pacvert.WORKING_QUEUE = sorted(pacvert.WORKING_QUEUE, key=attrgetter('status', 'finished'))
+            #pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.finished))
             pacvert.RESORT = False
-            #pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status))
         except Exception as e:
             logger.error("Resorting the queue failed with "+e.errno+":"+e.strerror)
 
