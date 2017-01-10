@@ -662,15 +662,14 @@ def sortQueue():
     """
     Sort working queue.
     """
-    try:
-        pacvert.RESORT = True
-        pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.finished))
-        pacvert.RESORT = False
-        #pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status))
-    except:
-        #queue probably empty?
-        """
-        """
+    if not pacvert.RESORT:
+        try:
+            pacvert.RESORT = True
+            pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.finished))
+            pacvert.RESORT = False
+            #pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status))
+        except Exception as e:
+            logger.error("Resorting the queue failed with "+e.errno+":"+e.strerror)
 
 def getNewFileID():
     """
