@@ -65,7 +65,7 @@ function fillSettings(name, content) {
 
 function fillSettingDiv(name, type, value, category) {
     if (name == "DEFAULT_CODEC_VIDEO") { // Altough DEFAULT_CODEC_VIDEO is a string variable, it's easier to build a dropdown box for this.
-        $("#table_"+category.toLowerCase()).append("<tr><td>"+name+":</td><td><select name='"+name+"' id='"+name+"' class='setting'><option value='hevc'>HEVC (x265)</option><option value='x264'>x264</option></select><td></tr>");
+        $("#table_"+category.toLowerCase()).append("<tr><td>"+name+":</td><td><select name='"+name+"' id='"+name+"' class='setting'><option value='hevc'>HEVC (x265)</option><option value='h264'>x264</option></select><td></tr>");
         document.getElementById(name).selectedIndex = ((value === "hevc") ? 0 : 1); // set selected value to either x264 or hevc
     } else {
         if (type == "bool") { // Boolean is represented by a dropdown box with the string representation of enabled and disabled.
