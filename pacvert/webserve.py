@@ -41,28 +41,13 @@ class WebInterface(object):
 
     @cherrypy.expose
     def index(self, **kwargs):
-        if pacvert.CONFIG.FIRST_RUN_COMPLETE:
-            raise cherrypy.HTTPRedirect(pacvert.HTTP_ROOT + "home")
-        else:
-            raise cherrypy.HTTPRedirect(pacvert.HTTP_ROOT + "home")
-            
-
-    ##### Welcome #####
-    @cherrypy.expose
-    def welcome(self, **kwargs):
-        # The setup wizard just refreshes the page on submit so we must redirect to home if config set.
-        if pacvert.CONFIG.FIRST_RUN_COMPLETE:
-            pacvert.initialize_scheduler()
-            raise cherrypy.HTTPRedirect(pacvert.HTTP_ROOT + "home")
-        else:
-            return serve_template(templatename="welcome.html", title="Welcome", config=config)
+        raise cherrypy.HTTPRedirect(pacvert.HTTP_ROOT + "home")
 
     ##### home #####
     @cherrypy.expose
     def home(self, **kwargs):
-        queueLength = len(pacvert.WORKING_QUEUE)
-        return serve_template(templatename="home.html", title="Home", queueLength=queueLength)
-        
+        return serve_template(templatename="home.html", title="Home")
+
     ##### update home #####
     @cherrypy.expose
     def update(self, start=None, end=None, statusFilter=None, updateName=None, updateID=None, up=None, down=None, remove=None):
@@ -76,24 +61,26 @@ class WebInterface(object):
             statusFilter = -1
         
         if not up is None:
-            up = pacvert.WORKING_QUEUE.index(returnQueueElementByFileID(int(up)))
-            if up > 1 and up < len(pacvert.WORKING_QUEUE):
-                pacvert.WORKING_QUEUE[up], pacvert.WORKING_QUEUE[up-1] = pacvert.WORKING_QUEUE[up-1], pacvert.WORKING_QUEUE[up]
+            try:
+                pacvert.thequeue.movePending(int(up), -1)
                 return "OK."
+            except:
+                return "Nope."
         
         if not down is None:
-            down = pacvert.WORKING_QUEUE.index(returnQueueElementByFileID(int(down)))
-            if down > 0 and down < len(pacvert.WORKING_QUEUE):
-                pacvert.WORKING_QUEUE[down], pacvert.WORKING_QUEUE[down+1] = pacvert.WORKING_QUEUE[down+1], pacvert.WORKING_QUEUE[down]
+            try:
+                pacvert.thequeue.movePending(int(down), 1)
                 return "OK."
+            except:
+                return "Nope."
         
         if not remove is None:
-            remove = pacvert.WORKING_QUEUE.index(returnQueueElementByFileID(int(remove)))
-            if remove >= 0 and remove < len(pacvert.WORKING_QUEUE):
-                pacvert.IGNORE_QUEUE.append(pacvert.WORKING_QUEUE[remove].fullpath)
-                del pacvert.WORKING_QUEUE[remove]
+            try:
+                pacvert.thequeue.deletePending(int(remove))
                 return "OK."
-        
+            except:
+                return "Nope."
+
         if not updateName is None:
             try:
                 updateName = replace_illegal_chars(sanitize(str(updateName)))
@@ -103,16 +90,11 @@ class WebInterface(object):
                 returnQueueElementByFileID(updateID).setRename(updateName)
                 return "OK."
             except ValueError:
-                logger.error("Can't update name of file.")         
-        
+                logger.error("Can't update name of file.")
+
         retValue = []
-        tempQueue = []
-        for i in pacvert.WORKING_QUEUE:
-            if statusFilter >= 0:
-                if i.status == statusFilter:
-                    tempQueue.append(i)
-            else:
-                tempQueue.append(i)
+        tempQueue = pacvert.thequeue.getMerged(statusFilter)
+
         if len(tempQueue) > 0:
             for i in range(min(start, len(tempQueue)), min(len(tempQueue),end)):
                 retValue.append(tempQueue[i].getAsDict())
@@ -131,7 +113,7 @@ class WebInterface(object):
                             firstSplit = str(paramVal).split(",")
                             for elem in firstSplit:
                                 secondSplit = elem.split(":")
-                                result[secondSplit[0]] = str(secondSplit[1])                            
+                                result[secondSplit[0]] = str(secondSplit[1])
                             pacvert.CONFIG.__setattr__(paramName, result)
                     elif type(_CONFIG_DEFINITIONS[paramName][2]) is list:
                         pacvert.CONFIG.__setattr__(paramName, paramVal.split(","))

@@ -659,18 +659,6 @@ def generateOutputFilename(filename):
     else: # if not just return
         return testname+testext
 
-def sortQueue():
-    """
-    Sort working queue.
-    """
-    if not pacvert.RESORT:
-        try:
-            pacvert.RESORT = True
-            pacvert.WORKING_QUEUE = sorted(pacvert.WORKING_QUEUE, key=attrgetter('status', 'finished'))
-            #pacvert.WORKING_QUEUE.sort(key=lambda l: (l.status, l.finished))
-            pacvert.RESORT = False
-        except Exception as e:
-            logger.error("Resorting the queue failed with "+e.errno+":"+e.strerror)
 
 def getNewFileID():
     """
@@ -683,7 +671,7 @@ def returnQueueElementByFileID(fileid):
     """
     Returns a queue element by it's file id
     """
-    for element in pacvert.WORKING_QUEUE:
+    for element in pacvert.thequeue.getMerged(-1):
         if element.fileid == fileid:
             return element
         

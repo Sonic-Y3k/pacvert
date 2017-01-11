@@ -8,7 +8,7 @@ import pacvert
 import logger
 from pymediainfo import MediaInfo
 import helpers
-from helpers import now, fullpathToPath, fullpathToExtension, sortQueue, statusToString, generateOutputFilename, getNewFileID
+from helpers import now, fullpathToPath, fullpathToExtension, statusToString, generateOutputFilename, getNewFileID
 import pacvert.config
 from pacvert.converter import Converter
 from pacvert.converter_ffmpeg import FFMpegError, FFMpegConvertError
@@ -21,8 +21,6 @@ def scan():
     for root,dirnames,filenames in walk(pacvert.CONFIG.SCAN_DIRECTORIES_PATH):
         for filename in filenames:
             if not is_file_ignored(path.join(root,filename)):
-                while pacvert.RESORT:
-                    time.sleep(1)
                 add_file_to_queue(path.join(root,filename))
 
 def add_file_to_queue(inputfile):
@@ -39,7 +37,7 @@ def add_file_to_queue(inputfile):
 
         if len(newfile.mediainfo) >= 1:
             logger.info("New file: '"+inputfile+"'")
-            pacvert.WORKING_QUEUE.append(newfile)
+            pacvert.thequeue.addPending(newfile)
             pacvert.IGNORE_QUEUE.append(inputfile)
         else:
             logger.debug("File '"+inputfile+"' doesn't have any tracks. It will be ignored.")
@@ -74,7 +72,7 @@ def is_file_in_queue(inputfile):
     Return: "True" if file exists
     Otherwise: "False".
     """
-    if any(x.fullpath == inputfile for x in pacvert.WORKING_QUEUE):
+    if any(x.fullpath == inputfile for x in pacvert.thequeue.getMerged(-1)):
         logger.debug("File '"+inputfile+"' already in working queue.")
         return True
     else:

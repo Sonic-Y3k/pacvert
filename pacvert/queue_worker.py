@@ -22,15 +22,17 @@ def run():
     """
     while True:
         try:
-            # start processing a file of we have items in queue and status of first item is pending.
-            if len(pacvert.WORKING_QUEUE) > 0 and pacvert.WORKING_QUEUE[0].status == 2:
-                pacvert.WORKING_QUEUE[0].updateStatus(0) # set status to active
+            active = pacvert.thequeue.getActive()
+            current = pacvert.thequeue.getPending()
+            if (active == None) and (current != None):
+                active = pacvert.thequeue.addActive(current)
+
                 try:
                     # setting up codec specific settings
                     video = {'codec': pacvert.CONFIG.DEFAULT_CODEC_VIDEO} # set the targets codec
                     if pacvert.CONFIG.DEFAULT_CODEC_VIDEO_CROP: # check if cropping is enabled
-                        video['width'] = pacvert.WORKING_QUEUE[0].crop[0] # set width
-                        video['height'] = pacvert.WORKING_QUEUE[0].crop[1] # set height
+                        video['width'] = active.crop[0] # set width
+                        video['height'] = active.crop[1] # set height
                         video['mode'] = 'crop' # set crop mode
 
                     if pacvert.CONFIG.DEFAULT_CODEC_VIDEO == "h264": # if target codec is h264
@@ -40,9 +42,9 @@ def run():
                         video['tune'] = pacvert.CONFIG.CODEC_AVC_TUNE # set tune
                         if pacvert.CONFIG.CODEC_AVC_AUTOMAXRATE: # if automatic maxrate is enabled
                             if pacvert.CONFIG.CODEC_AVC_BUFSIZE < 0 or pacvert.CONFIG.CODEC_H264_MAXRATE < 0:
-                                if  'bit_rate' in pacvert.WORKING_QUEUE[0].mediainfo['Video']:
-                                    video['maxrate'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
-                                    video['bufsize'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
+                                if  'bit_rate' in active.mediainfo['Video']:
+                                    video['maxrate'] = cast_to_int(active.mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
+                                    video['bufsize'] = cast_to_int(active.mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
                             else:
                                 video['maxrate'] = pacvert.CONFIG.CODEC_AVC_MAXRATE # set maxrate to given value
                                 video['bufsize'] = pacvert.CONFIG.CODEC_AVC_BUFSIZE # set bufsize to given value
@@ -54,9 +56,9 @@ def run():
                         video['tune'] = pacvert.CONFIG.CODEC_HEVC_TUNE # set tune
                         if pacvert.CONFIG.CODEC_HEVC_AUTOMAXRATE: # set max rate
                             if pacvert.CONFIG.CODEC_HEVC_BUFSIZE < 0 or pacvert.CONFIG.CODEC_HEVC_MAXRATE < 0:
-                                if  'bit_rate' in pacvert.WORKING_QUEUE[0].mediainfo['Video']:
-                                    video['maxrate'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
-                                    video['bufsize'] = cast_to_int(pacvert.WORKING_QUEUE[0].mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
+                                if  'bit_rate' in active.mediainfo['Video']:
+                                    video['maxrate'] = cast_to_int(active.mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
+                                    video['bufsize'] = cast_to_int(active.mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
                             else:
                                 video['maxrate'] = pacvert.CONFIG.CODEC_HEVC_MAXRATE # set maxrate to given value
                                 video['bufsize'] = pacvert.CONFIG.CODEC_HEVC_BUFSIZE # set bufsize to given value
@@ -68,7 +70,7 @@ def run():
                     else:
                         logger.error("Codec not yet implemented")
 
-                    conv = c.convert(pacvert.WORKING_QUEUE[0].fullpath, pacvert.WORKING_QUEUE[0].outputfilename,
+                    conv = c.convert(active.fullpath, active.outputfilename,
                     {
                         'format': 'mkv',
                         'video': video,
@@ -82,13 +84,14 @@ def run():
                     })
                     for timecode in conv:
                         logger.debug("Converting ("+str(timecode)+")...")
-                        pacvert.WORKING_QUEUE[0].progress = timecode
-                    logger.info("Finished File: '"+pacvert.WORKING_QUEUE[0].fullpath+"'")
-                    pacvert.WORKING_QUEUE[0].finished = now()
-                    pacvert.WORKING_QUEUE[0].updateStatus(3) # set status to finished
+                        active.progress = timecode
+                    logger.info("Finished File: '"+active.fullpath+"'")
+                    active.finished = now()
+                    pacvert.thequeue.addFinished(pacvert.thequeue.getActive()) # set status to finished
                 except FFMpegConvertError as e:
                     logger.error("ffmpeg: " +e.message + " with command: "+ e.cmd)
-                    pacvert.WORKING_QUEUE[0].updateStatus(4) # set status to failed
+
+                    pacvert.thequeue.addFailed(pacvert.thequeue.getActive()) # set status to failed
                 time.sleep(1)
-        except IndexError:
-            logger.error("Hm... there is a funny index error occured.")
+        except:
+            logger.error("Hue?")

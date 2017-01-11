@@ -186,14 +186,20 @@ function pullData(once = false) {
 
 function moveUp(id) {
     $.get( "update", { up: id } );
+    $("#table_progress").find("tr:gt(0)").remove();
+    pullData(true);
 }
 
 function moveDown(id) {
     $.get ( "update", {down: id} );
+    $("#table_progress").find("tr:gt(0)").remove();
+    pullData(true);
 }
 
 function remove(id) {
     $.get ( "update", {remove: id} );
+    $("#table_progress").find("tr:gt(0)").remove();
+    pullData(true);
 }
 
 function displayEdit() {

@@ -25,7 +25,7 @@ import queue_worker
 import scanner
 import versioncheck
 import pacvert.config
-from helpers import sortQueue
+from queue import Queue
 
 PROG_DIR = None
 FULL_PATH = None
@@ -73,6 +73,7 @@ WORKING_QUEUE = []
 IGNORE_QUEUE = []
 FILEID = -1
 RESORT = False
+thequeue = Queue()
 
 def initialize(config_file):
     with INIT_LOCK:
@@ -226,7 +227,7 @@ def initialize_scheduler():
         schedule_job(scanner.scan, 'Scan directories for new files', hours=0, minutes=0, seconds=seconds)
 
         #Update queue
-        schedule_job(helpers.sortQueue, 'Resort queue', hours=0, minutes=0, seconds=10)
+        #schedule_job(helpers.sortQueue, 'Resort queue', hours=0, minutes=0, seconds=10)
         
         # Work on queue
         #schedule_job(queue_worker.queue_worker, 'Work on queue', hours=0, minutes=0, seconds=5)
