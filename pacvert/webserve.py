@@ -99,7 +99,7 @@ class WebInterface(object):
             for i in range(min(start, len(tempQueue)), min(len(tempQueue),end)):
                 retValue.append(tempQueue[i].getAsDict())
         
-        retValue.append({'queue_length': len(tempQueue)})
+        retValue.append({'queue_length': len(tempQueue), 'commits_behind': pacvert.COMMITS_BEHIND})
         return json.dumps(retValue)
         
     @cherrypy.expose

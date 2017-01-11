@@ -72,6 +72,19 @@ h1 {
     font-family: 'Source Code Pro';
 }
 
+#update {
+	position: fixed;
+	height: auto ?;
+	width: 200px;
+	left: calc(50% - 100px);
+	top: 0;
+	right: calc(50% + 100px);
+	background-color: red;
+	padding: 0px;
+	margin: 0px;
+	visibility: hidden;
+	text-align: center;
+}
 #editBox {
     visibility: hidden;
     position: absolute;

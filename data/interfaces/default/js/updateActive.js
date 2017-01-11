@@ -122,17 +122,20 @@ function pullData(once = false) {
             $.each(parsedData, function (index, value) { // iterate over every json value returned
                 if (typeof value.queue_length !== 'undefined') {
                     updateTotalFiles(value.queue_length);
+                    if (parseInt(value.commits_behind) > 0) {
+                    	document.getElementById("update").style.visibility = 'visible';
+                    }
                     return false;
                 }
-                
+
                 var name = ((value.rename === null) ? value.fullpath.replace(/^.*[\\\/]/, '') : value.rename);
                 name += '<a href="#" onclick="javascript:editFileName('+value.id+',\''+value.fullpath+'\');">';
                 name += '<img src="images/white_pencil.svg" class="editpencil" alt="Edit">';
                 name += '</a>';
-                
+
                 /*
                 This one is quite a little complicated...
-                
+
                 In timedifference we calculate either the difference between the time we started and the time we ended or the time between the time we started and the current time.
                 In frameprogress we calculate how many frames we should have archieved by percentage
                 In fps we calculate how many frames we are converting in one second
@@ -141,7 +144,9 @@ function pullData(once = false) {
                 var timedifference = ((Date.parse(value.finished) !== 946681200000) ? Math.abs(Date.parse(value.finished) - Date.parse(value.timestarted)) : Math.abs(Date.now() - Date.parse(value.timestarted)) );
                 var frameProgress = parseFloat(value.progress)*parseFloat(value.mediainfo.Video.frame_count);
                 var fps = (parseFloat(frameProgress) / parseFloat(timedifference/1000)).toFixed(2);
-                var progress = ((value.status == "Finished") ? "100.00% (avg. "+fps+" FPS)" : (value.progress*100).toFixed(3)+" (avg. "+fps+" FPS)");
+                var eta = (fps > 0) ? msToTime(((parseFloat(value.mediainfo.Video.frame_count) - frameProgress) / fps) * 1000) : "00:00:00.0";
+                var elapsed = msToTime(Math.abs(Date.parse(value.finished) - Date.parse(value.timestarted)));
+                var progress = ((value.status == "Finished") ? "100.00% (avg. "+fps+" FPS | ET: "+elapsed+")" : (value.progress*100).toFixed(3)+"% (avg. "+fps+" FPS | ETA: "+eta+")");
                 
                 var controls = "";
                 if ((value.status != "Active") && (value.status != "Finished")) {
@@ -182,6 +187,19 @@ function pullData(once = false) {
             setTimeout(pullData, 1000);
         }
     });
+}
+
+function msToTime(duration) {
+    var milliseconds = parseInt((duration%1000)/100)
+        , seconds = parseInt((duration/1000)%60)
+        , minutes = parseInt((duration/(1000*60))%60)
+        , hours = parseInt((duration/(1000*60*60))%24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
 }
 
 function moveUp(id) {
