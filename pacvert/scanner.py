@@ -208,10 +208,7 @@ class ScannedFile:
         elif newVal == 3: # finished
             self.deleteOriginal() # delete original if successful transcoded and file deletion is enabled.
             self.performRename() # rename file if file was renamed via webinterface
-            
-        # resort queue
-        helpers.sortQueue()
-    
+
     def setRename(self, newName):
         """
         """

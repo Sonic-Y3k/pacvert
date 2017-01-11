@@ -25,7 +25,8 @@ def run():
             active = pacvert.thequeue.getActive()
             current = pacvert.thequeue.getPending()
             if (active == None) and (current != None):
-                active = pacvert.thequeue.addActive(current)
+                pacvert.thequeue.addActive(current)
+                active = current
 
                 try:
                     # setting up codec specific settings
@@ -93,5 +94,5 @@ def run():
 
                     pacvert.thequeue.addFailed(pacvert.thequeue.getActive()) # set status to failed
                 time.sleep(1)
-        except:
-            logger.error("Hue?")
+        except Exception as e:
+            logger.error(e)

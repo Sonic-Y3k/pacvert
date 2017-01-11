@@ -72,22 +72,22 @@ class Queue:
     def addActive(self, queueElement):
         logger.debug("Adding '"+queueElement.fullpath+"' to active.")
         self.active.append(self.updateStatus(queueElement, 0))
-        return self.active[len(self.active)-1]
+        #return self.active[-1]
 
     def addPending(self, queueElement):
         logger.debug("Adding '"+queueElement.fullpath+"' to pending.")
         self.pending.append(self.updateStatus(queueElement, 2))
-        return self.active[len(self.pending)-1]
+        #return self.active[-1]
 
     def addFinished(self, queueElement):
         logger.debug("Adding '"+queueElement.fullpath+"' to finished.")
         self.finished.append(self.updateStatus(queueElement, 3))
-        return self.finished[len(self.finished)-1]
+        #return self.finished[-1]
 
     def addFailed(self, queueElement):
         logger.debug("Adding '"+queueElement.fullpath+"' to failed.")
         self.error.append(self.updateStatus(queueElement, 4))
-        return self.error[len(self.error)-1]
+        #return self.error[-1]
 
     def lenActive(self):
         return len(self.active)
@@ -103,7 +103,7 @@ class Queue:
 
     def updateStatus(self, queueElement, newStatus):
         tempQueueElement = queueElement
-        tempQueueElement.status = newStatus
+        tempQueueElement.updateStatus(newStatus)
         return tempQueueElement
 
     def getIndexFromItemID(self, itemID):
