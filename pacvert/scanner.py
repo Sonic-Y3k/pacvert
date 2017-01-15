@@ -14,7 +14,8 @@ def scan():
         for root, directories, filenames in walk(pacvert.CONFIG.SCAN_DIRECTORIES_PATH):
             for filename in sorted(filenames):
                 full_path = path.join(root,filename)
-                if full_path not in pacvert.IGNORE_QUEUE and pacvert.CONFIG.SEARCH_FILE_FORMATS in full_path:
+                
+                if full_path not in pacvert.IGNORE_QUEUE and path.splitext(full_path)[1] in pacvert.CONFIG.SEARCH_FILE_FORMATS:
                     test_file = QueueElement(full_path)
                     
                     if test_file.file_validity() and test_file.file_configure():
