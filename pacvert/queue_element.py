@@ -75,7 +75,7 @@ class QueueElement:
         Keyword arguments:
         t -- minimum seconds since last file modification
         """
-        check_query = ((time() - path.getmtime(self.get_full_name_with_path())) > t)
+        check_query = (abs(time() - path.getmtime(self.get_full_name_with_path())) > t)
         logger.debug('  file_check_time_modified: '+str(check_query))
         return check_query
     
