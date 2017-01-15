@@ -357,7 +357,8 @@ class FFMpeg(object):
 
     @staticmethod
     def _spawn(cmds):
-        logger.debug('Spawning ffmpeg with command: ' + ' '.join(cmds))
+        if 'image2' not in cmds:
+            logger.debug('Spawning ffmpeg with command: ' + ' '.join(cmds))
         return Popen(cmds, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE,
                      close_fds=True)
 
@@ -526,13 +527,13 @@ class FFMpeg(object):
         @param filePath: path to created thumbnails
         >>> FFMpeg().cropAnalysis('/path/to/directory')
         """
+        
         for i in range(10):
             if not os.path.exists(filePath+'/'+str(i)+'.jpg'):
                 raise IOError('No such directory: '+filePath)
         
         cmds = [self.ffmpeg_path]
         cmds.extend(['-i',filePath+'/%1d.jpg','-vf','cropdetect=24:16:0','-f','null','-'])
-        logger.debug('Spawning ffmpeg with command: ' + ' '.join(cmds))
         proc_ffmpeg = check_output(cmds, stderr=STDOUT)
         crop = [0,0,0,0]
         for c in str(proc_ffmpeg.decode("ISO-8859-1")).split('\n'):

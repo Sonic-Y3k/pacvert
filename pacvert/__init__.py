@@ -25,7 +25,8 @@ import queue_worker
 import scanner
 import versioncheck
 import pacvert.config
-from queue import Queue
+from queue import ElementQueue
+from helpers import create_temp_directory, delete_temp_directory
 
 PROG_DIR = None
 FULL_PATH = None
@@ -69,11 +70,10 @@ HTTP_ROOT = None
 
 DEV = False
 
-WORKING_QUEUE = []
 IGNORE_QUEUE = []
 FILEID = -1
-RESORT = False
-thequeue = Queue()
+QUEUE = ElementQueue()
+TEMP = None
 
 def initialize(config_file):
     with INIT_LOCK:
@@ -85,9 +85,10 @@ def initialize(config_file):
         global LATEST_VERSION
         global UMASK
         global POLLING_FAILOVER
+        global QUEUE
         CONFIG = pacvert.config.Config(config_file)
         CONFIG_FILE = config_file
-
+        
         assert CONFIG is not None
 
         if _INITIALIZED:
@@ -273,7 +274,7 @@ def shutdown(restart=False, update=False):
 
     if not restart and not update:
         logger.info('pacvert is shutting down...')
-
+    
     if update:
         logger.info('pacvert is updating...')
         try:
@@ -301,6 +302,9 @@ def shutdown(restart=False, update=False):
         else:
             os.execv(exe, args)
 
+    logger.info('deleting temporary directory...')
+    delete_temp_directory()
+    
     os._exit(0)
 
 

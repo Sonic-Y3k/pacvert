@@ -3,131 +3,106 @@
 import pacvert
 import logger
 from operator import attrgetter
+from helpers import now
+from threading import RLock
+from inspect import currentframe, getouterframes
 
-class Queue:
-    # class variables
-    active = None
-    scanned = None
-    pending = None
-    finished = None
-    error = None
-
+class ElementQueue:
+    active = []
+    pending = []
+    failed = []
+    finished = []
+    lock = None
+    
+    def get_caller(self):
+        return getouterframes(currentframe())[1][3]
+    
     def __init__(self):
         """
         """
-        self.active = []
-        self.pending = []
-        self.finished = []
-        self.error = []
-
-    def sort(self, queue):
-        return sorted(queue, key=attrgetter('status', 'finished'))
-
-    def getActive(self, all=False):
-        if len(self.active) >= 0 and all == True:
-            return self.active
-        elif len(self.active) > 0 and all == False:
-            return self.active.pop(0)
+        self.lock = RLock()
+    
+    def get(self, cls_cat):
+        """
+        """
+        return getattr(self, cls_cat)
+    
+    def get_all(self, status_filter=-1):
+        """
+        """
+        if status_filter < 0:
+            return self.get('active')+self.get('pending')+self.get('failed')+self.get('finished')
+        elif status_filter == 0:
+            return self.get('active')
+        elif status_filter == 2:
+            return self.get('pending')
+        elif status_filter == 3:
+            return self.get('finished')
         else:
-            return None
+            return self.get('failed')
+    
+    def pop(self, cls_cat):
+        """
+        """
+        tempResult = []
+        with self.lock:
+            return self.get(cls_cat).pop(0)
 
-    def getPending(self, all=False):
-        if len(self.pending) >= 0 and all == True:
-            return self.pending
-        elif len(self.pending) > 0 and all == False:
-            return self.pending.pop(0)
-        else:
-            return None
+        return tempResult
+    
+    def remove(self, cls_id):
+        """
+        """
+        with self.lock:
+            for cat in ['pending', 'finished', 'error']:    
+                for elem in self.get(cat):
+                    if elem.unique_id == cls_id:
+                        self.get(cat).remove(elem)
+    
+    def move(self, cls_id, direction):
+        """
+        """
+        current_position = -1
+        with self.lock:
+            for cat in ['pending', 'finished', 'error']:
+                current_position = self.get_index_from_unique_id(cat, cls_id)
+                if current_position >= 0:
+                    new_index = current_position + direction
+                    if new_index <= self.len(cat) and new_index >= 0:
+                        self.get(cat)[current_position], self.get(cat)[new_index] = self.get(cat)[new_index], self.get(cat)[current_position]
+                
+    def append(self, cls_cat, obj):
+        """
+        """
+        with self.lock:
+            if cls_cat == 'active':
+                obj.status_set_status(0)
+                obj.status_set_start(now())
+                self.active.append(obj)
+            elif cls_cat == 'pending':
+                obj.status_set_status(2)
+                self.pending.append(obj)
+            elif cls_cat == 'finished':
+                obj.status_set_status(3)
+                obj.status_set_finished(now())
+                obj.perform_rename()
+                obj.delete_original()
+                self.finished.append(obj)
+            else:
+                obj.status_set_status(4)
+                obj.status_set_finished(now())
+                obj.delete_transcode()
+                self.failed.append(obj)
+            logger.debug(obj.file_name+obj.file_extension+' is set to '+cls_cat)
 
-    def getFinished(self, all=False):
-        if len(self.finished) >= 0 and all == True:
-            return self.finished
-        elif len(self.finished) > 0 and all == False:
-            return self.finished.pop(0)
-        else:
-            return None
-
-    def getError(self, all=False):
-        if len(self.error) >= 0 and all == True:
-            return self.error
-        elif len(self.error) > 0 and all == False:
-            return self.error.pop(0)
-        else:
-            return None
-
-    def getMerged(self, status=-1):
-        if (status == -1):
-            merged = self.getActive(True) + self.getPending(True) + self.getFinished(True) + self.getError(True)
-            return merged
-        elif (status == 0):
-            return self.getActive(True)
-        elif (status == 2):
-            return self.getPending(True)
-        elif (status == 3):
-            return self.getFinished(True)
-        else:
-            return self.getError(True)
-
-
-    def addActive(self, queueElement):
-        logger.debug("Adding '"+queueElement.fullpath+"' to active.")
-        self.active.append(self.updateStatus(queueElement, 0))
-        #return self.active[-1]
-
-    def addPending(self, queueElement):
-        logger.debug("Adding '"+queueElement.fullpath+"' to pending.")
-        self.pending.append(self.updateStatus(queueElement, 2))
-        #return self.active[-1]
-
-    def addFinished(self, queueElement):
-        logger.debug("Adding '"+queueElement.fullpath+"' to finished.")
-        self.finished.append(self.updateStatus(queueElement, 3))
-        #return self.finished[-1]
-
-    def addFailed(self, queueElement):
-        logger.debug("Adding '"+queueElement.fullpath+"' to failed.")
-        self.error.append(self.updateStatus(queueElement, 4))
-        #return self.error[-1]
-
-    def lenActive(self):
-        return len(self.active)
-
-    def lenPending(self):
-        return len(self.pending)
-
-    def lenFinished(self):
-        return len(self.finished)
-
-    def lenFailed(self):
-        return len(self.failed)
-
-    def updateStatus(self, queueElement, newStatus):
-        tempQueueElement = queueElement
-        tempQueueElement.updateStatus(newStatus)
-        return tempQueueElement
-
-    def getIndexFromItemID(self, itemID):
-        result = -1
-        for i in self.getPending(True):
-            if i.fileid == itemID:
-                result = self.pending.index(i)
-
-        return result
-
-    def movePending(self, itemID, position):
-        currentID = self.getIndexFromItemID(itemID)
-        newIndex = currentID
-        if position > 0:
-            # we are moving down the list (increasing index)
-            if (currentID + position) <= self.lenPending():
-                newIndex = currentID + position
-        else:
-            if (currentID + position) >= 0:
-                newIndex = currentID + position
-
-        self.pending[currentID], self.pending[newIndex] = self.pending[newIndex], self.pending[currentID]
-
-    def deletePending(self, itemID):
-        currentID = self.getIndexFromItemID(itemID)
-        if currentID >= 0:
-            pacvert.IGNORE_QUEUE.append(self.pending.pop(currentID).fullpath)
+    def len(self, cls_cat):
+        return len(self.get(cls_cat))
+    
+    def get_index_from_unique_id(self, cls_cat, obj_id):
+        try:
+            for i in self.get(cls_cat):
+                if i.unique_id == obj_id:
+                    return self.get(cls_cat).index(i)
+        except ValueError:
+            return -1
+        return -1

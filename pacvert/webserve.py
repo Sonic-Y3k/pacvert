@@ -41,7 +41,7 @@ class WebInterface(object):
 
     @cherrypy.expose
     def index(self, **kwargs):
-        raise cherrypy.HTTPRedirect(pacvert.HTTP_ROOT + "home")
+        return serve_template(templatename="home.html", title="Home")
 
     ##### home #####
     @cherrypy.expose
@@ -50,55 +50,54 @@ class WebInterface(object):
 
     ##### update home #####
     @cherrypy.expose
-    def update(self, start=None, end=None, statusFilter=None, updateName=None, updateID=None, up=None, down=None, remove=None):
+    def update(self, start=None, end=None, status_filter=None, updateName=None, updateID=None, up=None, down=None, remove=None):
         try:
             start = int(start)
             end = int(end)
-            statusFilter = int(statusFilter)
+            status_filter = int(status_filter)
         except TypeError:
             start = 0
             end = 20
-            statusFilter = -1
+            status_filter = -1
         
         if not up is None:
             try:
-                pacvert.thequeue.movePending(int(up), -1)
+                pacvert.QUEUE.move(int(up), -1)
                 return "OK."
             except:
                 return "Nope."
         
         if not down is None:
             try:
-                pacvert.thequeue.movePending(int(down), 1)
+                pacvert.QUEUE.move(int(down), 1)
                 return "OK."
             except:
                 return "Nope."
         
         if not remove is None:
             try:
-                pacvert.thequeue.deletePending(int(remove))
+                pacvert.QUEUE.remove(int(remove))
                 return "OK."
             except:
                 return "Nope."
 
-        if not updateName is None:
+        if updateName is not None and updateID is not None:
             try:
                 updateName = replace_illegal_chars(sanitize(str(updateName)))
                 if (len(updateName) < 2):
                     return "Illegal character detected."
                 updateID = int(updateID)
-                returnQueueElementByFileID(updateID).setRename(updateName)
+                returnQueueElementByFileID(updateID).output_rename(updateName)
                 return "OK."
-            except ValueError:
-                logger.error("Can't update name of file.")
+            except Exception as e:
+                logger.error("Can't update name of file."+e.message)
 
         retValue = []
-        tempQueue = pacvert.thequeue.getMerged(statusFilter)
-
+        tempQueue = pacvert.QUEUE.get_all(status_filter)
+        
         if len(tempQueue) > 0:
             for i in range(min(start, len(tempQueue)), min(len(tempQueue),end)):
-                retValue.append(tempQueue[i].getAsDict())
-        
+                retValue.append(tempQueue[i].export_object())
         retValue.append({'queue_length': len(tempQueue), 'commits_behind': pacvert.COMMITS_BEHIND})
         return json.dumps(retValue)
         

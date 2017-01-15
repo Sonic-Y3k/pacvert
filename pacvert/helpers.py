@@ -19,10 +19,29 @@ import urllib, urllib2
 from xml.dom import minidom
 import xmltodict
 from operator import attrgetter
+from tempfile import mkdtemp
+from shutil import rmtree
 
 import pacvert
 import logger
 #from pacvert.api2 import API2
+
+def create_temp_directory():
+    """ Creates a temporary directory
+    """
+    temp_directory = mkdtemp()
+    logger.debug("Creating temporary directory '"+temp_directory+"'.")
+    return temp_directory
+
+def delete_temp_directory():
+    """ Removes temporary directory
+    """
+    try:
+        rmtree(pacvert.TEMP)
+    except OSError as e:
+        logger.error("Can't remove temp directory ("+pacvert.TEMP+").")
+    except TypeError as e:
+        logger.error('Can\'t delete temp directory')
 
 def fullpathToFilename(fullpath):
     return os.path.basename(fullpath)
@@ -671,8 +690,8 @@ def returnQueueElementByFileID(fileid):
     """
     Returns a queue element by it's file id
     """
-    for element in pacvert.thequeue.getMerged(-1):
-        if element.fileid == fileid:
+    for element in pacvert.QUEUE.get_all():
+        if element.unique_id == fileid:
             return element
         
     return None

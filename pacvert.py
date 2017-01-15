@@ -20,6 +20,7 @@ import time
 
 import pacvert
 from pacvert import config, logger, queue_worker, webstart
+from pacvert.helpers import create_temp_directory
 
 # Register signals, such as CTRL + C
 signal.signal(signal.SIGINT, pacvert.sig_handler)
@@ -157,13 +158,16 @@ def main():
     # Read config and start logging
     pacvert.initialize(config_file)
 
+    # Set up Temp
+    pacvert.TEMP = create_temp_directory()
+
     # Start the background threads
     pacvert.start()
 
     try:
         queue_worker.start_thread()
-    except:
-        logger.error(u"Main thread did exit. Wtf.")
+    except Exception as e:
+        logger.error(u"Main thread did exit: "+e.message)
 
     # Force the http port if neccessary
     if args.port:

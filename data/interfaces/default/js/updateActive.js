@@ -112,7 +112,7 @@ function pullData(once = false) {
     $.get("update", {
         start: default_start,
         end: default_end,
-        statusFilter: default_status
+        status_filter: default_status
     }).done(function (data) {
         var parsedData = JSON.parse(data);
         if (parsedData === 0) {
@@ -127,9 +127,11 @@ function pullData(once = false) {
                     }
                     return false;
                 }
-
-                var name = ((value.rename === null) ? value.fullpath.replace(/^.*[\\\/]/, '') : value.rename);
-                name += '<a href="#" onclick="javascript:editFileName('+value.id+',\''+value.fullpath+'\');">';
+                
+                var fullpath = value.file_path+'/'+value.file_name+value.file_extension;
+                fullpath = (fullpath.length > 60) ? '...'+fullpath.slice(Math.max(0,fullpath.length-60),fullpath.length) : fullpath;
+                var name = ((value.file_rename === null) ? value.file_name+value.file_extension : value.file_rename);
+                name += '<a href="#" onclick="javascript:editFileName('+value.unique_id+',\''+fullpath+'\');">';
                 name += '<img src="images/white_pencil.svg" class="editpencil" alt="Edit">';
                 name += '</a>';
 
@@ -141,27 +143,52 @@ function pullData(once = false) {
                 In fps we calculate how many frames we are converting in one second
                 In progress we just print the values.
                 */
-                var timedifference = ((Date.parse(value.finished) !== 946681200000) ? Math.abs(Date.parse(value.finished) - Date.parse(value.timestarted)) : Math.abs(Date.now() - Date.parse(value.timestarted)) );
-                var frameProgress = parseFloat(value.progress)*parseFloat(value.mediainfo.Video.frame_count);
+                var timedifference = ((Date.parse(value.file_status_finished) !== 946681200000) ? Math.abs(Date.parse(value.file_status_finished) - Date.parse(value.file_status_start)) : Math.abs(Date.now() - Date.parse(value.file_status_start)) );
+                var frameProgress = parseFloat(value.file_status_progress)*parseFloat(value.mediainfo.Video.frame_count);
                 var fps = (parseFloat(frameProgress) / parseFloat(timedifference/1000)).toFixed(2);
                 var eta = (fps > 0) ? msToTime(((parseFloat(value.mediainfo.Video.frame_count) - frameProgress) / fps) * 1000) : "00:00:00.0";
-                var elapsed = msToTime(Math.abs(Date.parse(value.finished) - Date.parse(value.timestarted)));
-                var progress = ((value.status == "Finished") ? "100.00% (avg. "+fps+" FPS | ET: "+elapsed+")" : (value.progress*100).toFixed(3)+"% (avg. "+fps+" FPS | ETA: "+eta+")");
+                var elapsed = msToTime(Math.abs(Date.parse(value.file_status_finished) - Date.parse(value.file_status_start)));
+                var progress = ((value.file_status_status == 3) ? "100.00% (avg. "+fps+" FPS | ET: "+elapsed+")" : (value.file_status_progress*100).toFixed(3)+"% (avg. "+fps+" FPS | ETA: "+eta+")");
                 
                 var controls = "";
-                if ((value.status != "Active") && (value.status != "Finished")) {
-                    controls += '<div class="arrows"><a href="javascript:moveDown('+value.id+')"><img src="../images/action_arrow_down.svg" class="arrow_down"></a>';
-                    controls += '<a href="javascript:moveUp('+value.id+')"><img src="../images/action_arrow_up.svg" class="arrow_up"></a>';
-                    controls += '<a href="javascript:remove('+value.id+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>';
-                } else if (value.status == "Finished") {
-                    controls += '<div class="arrows"><a href="javascript:remove('+value.id+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>';
+                if ((value.file_status_status !== 0) && (value.file_status_status != 3)) {
+                    controls += '<div class="arrows"><a href="javascript:moveDown('+value.unique_id+')"><img src="../images/action_arrow_down.svg" class="arrow_down"></a>';
+                    controls += '<a href="javascript:moveUp('+value.unique_id+')"><img src="../images/action_arrow_up.svg" class="arrow_up"></a>';
+                    controls += '<a href="javascript:remove('+value.unique_id+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>';
+                } else if (value.file_status_status == 3) {
+                    controls += '<div class="arrows"><a href="javascript:remove('+value.unique_id+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>';
                 }
                 
-                var col = [ value.added,
+                var sizetab = humanFileSize(value.file_size);
+                if ((value.file_status_status == 0) || (value.file_status_status == 3)) {
+                    if (value.output_size > 0) {
+                        sizetab += " ("+humanFileSize(value.output_size)+")";
+                    }
+                }
+                var string_status = 'Undefined';
+                switch (value.file_status_status) {
+                    case 0:
+                        string_status = 'Active';
+                        break;
+                    case 1:
+                        string_status = 'Scanned';
+                        break;
+                    case 2:
+                        string_status = 'Pending';
+                        break;
+                    case 3:
+                        string_status = 'Finished';
+                        break;
+                    case 4:
+                        string_status = 'Failed';
+                        break;
+                }
+                
+                var col = [ value.file_status_added,
                             name,
                             value.mediainfo.General.format,
-                            humanFileSize(value.mediainfo.General.file_size),
-                            value.status,
+                            sizetab,
+                            string_status,
                             progress,
                             controls];
                 
