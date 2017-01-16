@@ -278,13 +278,12 @@ class QueueElement:
     def get_output_filesize(self):
         """ Returns the filesize of output
         """
-        if (self.file_status_status >= 3) \
-                or (self.file_status_status < 3 \
-                and self.file_status_added > 0):
+        if (self.file_status_status >= 3):
             return self.file_output_size
         else:
             if path.exists(self.file_output):
-                return path.getsize(self.file_output)
+                self.file_output_size = path.getsize(self.file_output)
+                return self.file_output_size
             else:
                 return 0
     

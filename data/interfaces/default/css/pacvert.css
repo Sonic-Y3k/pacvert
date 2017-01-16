@@ -169,10 +169,16 @@ h1 {
 }
 
 .denied {
-    position: relative;
     width: 16px;
     height: 16px;
     cursor: pointer;
+}
+
+.cls_denied {
+    position: fixed;
+    vertical-align: middle;
+    height: 100%;
+    right: 50px;
 }
 
 .settings_footer {
