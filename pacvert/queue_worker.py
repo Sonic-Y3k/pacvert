@@ -21,10 +21,14 @@ def run():
     Scan given directory for new files.
     """
     while True:
-        if (pacvert.QUEUE.len('active') == 0) and (pacvert.QUEUE.len('pending') > 0):
-            active = pacvert.QUEUE.pop('pending')
-            pacvert.QUEUE.append('active', active)
+        active = None
+        with pacvert.QUEUE_LOCK:
+            if (pacvert.QUEUE.len('active') == 0) and (pacvert.QUEUE.len('pending') > 0):
+                active = pacvert.QUEUE.pop('pending')
+                pacvert.QUEUE.append('active', active)
         
+        if active is not None:
+            logger.info('starting job for \''+active.file_name+active.file_extension+'\'')
             try:
                 # setting up codec specific settings
                 video = {'codec': pacvert.CONFIG.DEFAULT_CODEC_VIDEO} # set the targets codec
@@ -81,9 +85,12 @@ def run():
                     'map': 0,
                 })
                 for timecode in conv:
-                    active.file_status_progress = timecode
-                logger.info("Finished File: '"+active.file_name+active.file_extension+"'")
-                pacvert.QUEUE.append('finished', pacvert.QUEUE.pop('active')) # set status to finished
+                    with pacvert.QUEUE_LOCK:
+                        active.file_status_progress = timecode
+                logger.info("finished job '"+active.file_name+active.file_extension+"'")
+                with pacvert.QUEUE_LOCK:
+                    pacvert.QUEUE.append('finished', pacvert.QUEUE.pop('active')) # set status to finished
             except FFMpegConvertError as e:
                 logger.error("ffmpeg: " +e.message + " with command: "+ e.cmd)
-                pacvert.QUEUE.append('failed', pacvert.QUEUE.pop('active')) # set status to failed
+                with pacvert.QUEUE_LOCK:
+                    pacvert.QUEUE.append('failed', pacvert.QUEUE.pop('active')) # set status to failed

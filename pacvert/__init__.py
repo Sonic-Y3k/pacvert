@@ -73,6 +73,8 @@ DEV = False
 IGNORE_QUEUE = []
 FILEID = -1
 QUEUE = ElementQueue()
+QUEUE_LOCK = threading.Lock()
+SCAN_LOCK = threading.Lock()
 TEMP = None
 
 def initialize(config_file):

@@ -62,21 +62,24 @@ class WebInterface(object):
         
         if not up is None:
             try:
-                pacvert.QUEUE.move(int(up), -1)
+                with pacvert.QUEUE_LOCK:
+                    pacvert.QUEUE.move(int(up), -1)
                 return "OK."
             except:
                 return "Nope."
         
         if not down is None:
             try:
-                pacvert.QUEUE.move(int(down), 1)
+                with pacvert.QUEUE_LOCK:
+                    pacvert.QUEUE.move(int(down), 1)
                 return "OK."
             except:
                 return "Nope."
         
         if not remove is None:
             try:
-                pacvert.QUEUE.remove(int(remove))
+                with pacvert.QUEUE_LOCK:
+                    pacvert.QUEUE.remove(int(remove))
                 return "OK."
             except:
                 return "Nope."
@@ -93,7 +96,8 @@ class WebInterface(object):
                 logger.error("Can't update name of file."+e.message)
 
         retValue = []
-        tempQueue = pacvert.QUEUE.get_all(status_filter)
+        with pacvert.QUEUE_LOCK:
+            tempQueue = pacvert.QUEUE.get_all(status_filter)
         
         if len(tempQueue) > 0:
             for i in range(min(start, len(tempQueue)), min(len(tempQueue),end)):

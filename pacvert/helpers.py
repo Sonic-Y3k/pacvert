@@ -690,9 +690,10 @@ def returnQueueElementByFileID(fileid):
     """
     Returns a queue element by it's file id
     """
-    for element in pacvert.QUEUE.get_all():
-        if element.unique_id == fileid:
-            return element
+    with pacvert.QUEUE_LOCK:
+        for element in pacvert.QUEUE.get_all():
+            if element.unique_id == fileid:
+                return element
         
     return None
 

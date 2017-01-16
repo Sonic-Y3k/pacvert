@@ -45,8 +45,31 @@ th, td {
 }
 
 .col_timeadded {
-    min-width: 70px;
-    max-width: 70px;
+    width: 140px;
+}
+
+.col_filename {
+    width: calc( 100% - 740px )
+}
+
+.col_format {
+    width: 100px;
+}
+
+.col_size {
+    width: 150px;
+}
+
+.col_status {
+    width: 50px;
+}
+
+.col_progress {
+    width: 250px;
+}
+
+.col_controls {
+    width: 50px;
 }
 
 
@@ -146,7 +169,7 @@ h1 {
 }
 
 .denied {
-    position: absolute;
+    position: relative;
     width: 16px;
     height: 16px;
     cursor: pointer;

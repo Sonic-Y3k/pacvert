@@ -148,7 +148,7 @@ function pullData(once = false) {
                 var fps = (parseFloat(frameProgress) / parseFloat(timedifference/1000)).toFixed(2);
                 var eta = (fps > 0) ? msToTime(((parseFloat(value.mediainfo.Video.frame_count) - frameProgress) / fps) * 1000) : "00:00:00.0";
                 var elapsed = msToTime(Math.abs(Date.parse(value.file_status_finished) - Date.parse(value.file_status_start)));
-                var progress = ((value.file_status_status == 3) ? "100.00% (avg. "+fps+" FPS | ET: "+elapsed+")" : (value.file_status_progress*100).toFixed(3)+"% (avg. "+fps+" FPS | ETA: "+eta+")");
+                var progress = ((value.file_status_status == 3) ? "100.00%<br>avg. "+fps+" FPS, ET: "+elapsed : (value.file_status_progress*100).toFixed(3)+"%<br>avg. "+fps+" FPS, ETA: "+eta);
                 
                 var controls = "";
                 if ((value.file_status_status !== 0) && (value.file_status_status != 3)) {
@@ -161,8 +161,8 @@ function pullData(once = false) {
                 
                 var sizetab = humanFileSize(value.file_size);
                 if ((value.file_status_status == 0) || (value.file_status_status == 3)) {
-                    if (value.output_size > 0) {
-                        sizetab += " ("+humanFileSize(value.output_size)+")";
+                    if (value.file_output_size > 0) {
+                        sizetab += " ("+humanFileSize(value.file_output_size)+")";
                     }
                 }
                 var string_status = 'Undefined';

@@ -21,13 +21,15 @@ class QueueElement:
     file_extension = None   # File extension
     file_size = None        # File size in bytes
     file_output = None      # Output
+    file_output_size = 0    # Size of output file
     file_rename = None      # After transcode, rename.
     file_status_progress = 0.0
     file_status_status = 1
-    file_status_crop = ''
+    file_status_crop = [0,0,0,0]
     file_status_added = now()
     file_status_start = 0
     file_status_finished = 0
+    file_valid = False
     mediainfo = {}          # stores mediainfo informations
     unique_id = None        # unique id to identify a file queue independently
 
@@ -38,13 +40,13 @@ class QueueElement:
         self.file_name, self.file_extension = path.splitext(path.basename(cls_filename))
         self.file_size = path.getsize(cls_filename)
         logger.debug("creating new queue element '"+self.file_name+self.file_extension+"'")
+        self.file_valid = self.file_validity()
     
     def file_configure(self):
         """ Configures object and sets required atributes
         """
         logger.debug('starting configuration of queue element \''+self.file_name+self.file_extension+'\'')
         self.file_output = self.get_new_name_with_path()
-        self.get_mediainfo()
         self.unique_id = getNewFileID()
         
         try:
@@ -60,13 +62,22 @@ class QueueElement:
             logger.error('failed configuration of queue element \''+self.file_name+self.file_extension+'\'')
         return check_query
         
+    def set_mediainfo(self, cls_mediainfo):
+        """
+        """
+        self.mediainfo = cls_mediainfo
+        track_diff = str(self.get_track_count_from_mediainfo('Video'))+'v, ' \
+                    +str(self.get_track_count_from_mediainfo('Audio'))+'a, ' \
+                    +str(self.get_track_count_from_mediainfo('Subtitle'))+'s'
+        logger.debug('  pulled '+str(self.get_track_count_from_mediainfo())+' ('+track_diff+') tracks.')
+    
     def file_check_existance(self):
         """ Checks if file exists
         """
         check_query = (path.isfile(self.get_full_name_with_path()))
         if not check_query:
+            logger.error(self.file_name+self.file_extension+' does not exist?!')
             pacvert.IGNORE_QUEUE.append(self.get_full_name_with_path())
-        logger.debug('  file_check_existance: '+str(check_query))
         return check_query
             
     def file_check_time_modified(self, t=30):
@@ -76,7 +87,6 @@ class QueueElement:
         t -- minimum seconds since last file modification
         """
         check_query = ((time() - path.getmtime(self.get_full_name_with_path())) > t)
-        logger.debug('  file_check_time_modified: '+str(check_query))
         return check_query
     
     def file_check_extension(self):
@@ -84,8 +94,8 @@ class QueueElement:
         """
         check_query = (self.file_extension in pacvert.CONFIG.SEARCH_FILE_FORMATS)
         if not check_query:
+            logger.error(self.file_name+self.file_extension+' has a invalid extension.')
             pacvert.IGNORE_QUEUE.append(self.get_full_name_with_path())
-        logger.debug('  file_check_extension: '+str(check_query))
         return check_query
         
     def file_check_directory(self):
@@ -93,8 +103,8 @@ class QueueElement:
         """
         check_query = (pacvert.CONFIG.OUTPUT_DIRECTORY not in self.file_path)
         if not check_query:
+            logger.error(self.file_name+self.file_extension+' is in our output directory.')
             pacvert.IGNORE_QUEUE.append(self.get_full_name_with_path())
-        logger.debug('  file_check_directory: '+str(check_query))
         return check_query
     
     def file_check_size(self, minimum=1048576):
@@ -105,8 +115,8 @@ class QueueElement:
         """
         check_query = (self.file_size > minimum)
         if not check_query:
+            logger.error(self.file_name+self.file_extension+' is to small ('+self.file_size+' bytes)')
             pacvert.IGNORE_QUEUE.append(self.get_full_name_with_path())
-        logger.debug('  file_check_size: '+str(check_query))
         return check_query
 
     def file_validity(self):
@@ -180,35 +190,6 @@ class QueueElement:
             logger.error(e.message)
             return 0
         return counter
-
-    def get_mediainfo(self):
-        """ Gathers mediainfo informations
-        """
-        try:
-            logger.debug("  starting to pull mediainfo from "+self.file_name+self.file_extension)
-            tempMediainfo = MediaInfo.parse(self.get_full_name_with_path()) # try to parse mediainfo from file
-            
-            for track in tempMediainfo.tracks:
-                if track.track_type == 'General':
-                    self.mediainfo['General'] = track.to_data()
-                elif track.track_type == 'Video' and 'Video' not in self.mediainfo:
-                    self.mediainfo['Video'] = track.to_data()
-                elif track.track_type == 'Video' and 'Video' in self.mediainfo:
-                    if track.stram_size > self.mediainfo['Video']['stream_size']:
-                        self.mediainfo['Video'] = track.to_data()
-                elif track.track_type not in self.mediainfo and track.track_type not in ['Video', 'General']:
-                    self.mediainfo[track.track_type] = []
-                    self.mediainfo[track.track_type].append(track.to_data())
-                else:
-                    self.mediainfo[track.track_type].append(track.to_data())
-            
-            track_diff = str(self.get_track_count_from_mediainfo('Video'))+'v, ' \
-                        +str(self.get_track_count_from_mediainfo('Audio'))+'a, ' \
-                        +str(self.get_track_count_from_mediainfo('Subtitle'))+'s'
-            logger.debug('  successfully pulled '+str(self.get_track_count_from_mediainfo())+' ('+track_diff+') tracks from \''+self.file_name+self.file_extension+'\'.')
-        except Exception as e:
-            self.mediainfo = {}
-            logger.error("Getting mediainfo from '"+self.get_full_name_with_path()+"' failed with: "+e.strerror)
     
     def delete_original(self):
         """ Deletes the original file
@@ -285,14 +266,27 @@ class QueueElement:
         self.file_status_status = cls_new_status
         
     def status_set_start(self, cls_new_start=now()):
-        """
+        """ Set object start time to cls_new_start
         """
         self.file_status_start = cls_new_start
     
     def status_set_finished(self, cls_new_finished=now()):
-        """
+        """ Set object finished time to cls_new_finished
         """
         self.file_status_finished = cls_new_finished
+    
+    def get_output_filesize(self):
+        """ Returns the filesize of output
+        """
+        if (self.file_status_status >= 3) \
+                or (self.file_status_status < 3 \
+                and self.file_status_added > 0):
+            return self.file_output_size
+        else:
+            if path.exists(self.file_output):
+                return path.getsize(self.file_output)
+            else:
+                return 0
     
     def export_object(self):
         """ Export our file into dict
@@ -310,6 +304,7 @@ class QueueElement:
             'file_status_added': self.file_status_added,
             'file_status_start': self.file_status_start,
             'file_status_finished': self.file_status_finished,
+            'file_output_size': self.get_output_filesize(),
             'mediainfo': self.mediainfo,
             'unique_id': self.unique_id
         }
