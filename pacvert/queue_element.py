@@ -86,7 +86,12 @@ class QueueElement:
         Keyword arguments:
         t -- minimum seconds since last file modification
         """
+<<<<<<< HEAD
         check_query = ((time() - path.getmtime(self.get_full_name_with_path())) > t)
+=======
+        check_query = (abs(time() - path.getmtime(self.get_full_name_with_path())) > t)
+        logger.debug('  file_check_time_modified: '+str(check_query))
+>>>>>>> 749771c3516a58c8e2564ab13075d5cc5e7f40b4
         return check_query
     
     def file_check_extension(self):
@@ -222,10 +227,10 @@ class QueueElement:
             logger.debug("  finished deleting thumbs.")
             self.file_status_crop = crop_rectangle
         except FFMpegError:
-            return [self.mediainfo['Video']['width'],self.mediainfo['Video']['height'],0,0]
+            return [cast_to_int(self.mediainfo['Video']['width']),cast_to_int(self.mediainfo['Video']['height']),0,0]
         except Exception as e:
             logger.error("Failing to create cropping rectangle with following message: "+e.message)
-            return [self.mediainfo['Video']['width'],self.mediainfo['Video']['height'],0,0]
+            return [cast_to_int(self.mediainfo['Video']['width']),cast_to_int(self.mediainfo['Video']['height']),0,0]
         
     def create_thumbs(self):
         """ Create thumbnails for crop-rectangle analysis
@@ -249,7 +254,7 @@ class QueueElement:
         except Exception as e:
             logger.error('  crop failed with: '+e.message)
         
-        return [self.mediainfo['Video']['width'],self.mediainfo['Video']['height'],0,0]
+        return [cast_to_int(self.mediainfo['Video']['width']),cast_to_int(self.mediainfo['Video']['height']),0,0]
 
     def delete_thumbs(self):
         """ Delete created jpegs

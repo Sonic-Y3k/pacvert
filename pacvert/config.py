@@ -44,6 +44,7 @@ _CONFIG_DEFINITIONS = {
     'CODEC_HEVC_TUNE': (str, 'CodecSettings', ''),
     'CODEC_VP8_QUALITY': (float, 'CodecSettings', 10),
     'CODEC_VP8_THREADS': (int, 'CodecSettings', 1),
+    'DEBUG': (bool, 'General', True),
     'DEFAULT_CODEC_AUDIO': (str, 'CodecSettings', 'copy'),
     'DEFAULT_CODEC_AUDIO_CONVERT': (bool, 'CodecSettings', False),
     'DEFAULT_CODEC_SUBTITLE': (str, 'CodecSettings', 'copy'),

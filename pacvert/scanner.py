@@ -12,6 +12,7 @@ def scan():
     Scan given directory for new files.
     """
     try:
+<<<<<<< HEAD
         with pacvert.SCAN_LOCK:
             for root, directories, filenames in walk(pacvert.CONFIG.SCAN_DIRECTORIES_PATH):
                 for filename in sorted(filenames):
@@ -26,6 +27,20 @@ def scan():
                         
                             with pacvert.QUEUE_LOCK:    
                                 pacvert.QUEUE.append('pending', test_file)
+=======
+        for root, directories, filenames in walk(pacvert.CONFIG.SCAN_DIRECTORIES_PATH):
+            for filename in sorted(filenames):
+                full_path = path.join(root,filename)
+                
+                if full_path not in pacvert.IGNORE_QUEUE and path.splitext(full_path)[1] in pacvert.CONFIG.SEARCH_FILE_FORMATS:
+                    test_file = QueueElement(full_path)
+                    
+                    if test_file.file_validity() and test_file.file_configure():
+                        pacvert.IGNORE_QUEUE.append(full_path)
+                        pacvert.QUEUE.append('pending', test_file)
+                    else:
+                        logger.error('can\' add '+full_path+' to queue. Probably to young.')
+>>>>>>> 749771c3516a58c8e2564ab13075d5cc5e7f40b4
     except Exception as e:
         logger.error('scanning directory \''+pacvert.CONFIG.SCAN_DIRECTORIES_PATH+'\' failed with: '+e.message)
         
