@@ -24,7 +24,7 @@ class QueueElement:
     file_rename = None      # After transcode, rename.
     file_status_progress = 0.0
     file_status_status = 1
-    file_status_crop = ''
+    file_status_crop = [0,0,0,0]
     file_status_added = now()
     file_status_start = 0
     file_status_finished = 0
@@ -241,10 +241,10 @@ class QueueElement:
             logger.debug("  finished deleting thumbs.")
             self.file_status_crop = crop_rectangle
         except FFMpegError:
-            return [self.mediainfo['Video']['width'],self.mediainfo['Video']['height'],0,0]
+            return [cast_to_int(self.mediainfo['Video']['width']),cast_to_int(self.mediainfo['Video']['height']),0,0]
         except Exception as e:
             logger.error("Failing to create cropping rectangle with following message: "+e.message)
-            return [self.mediainfo['Video']['width'],self.mediainfo['Video']['height'],0,0]
+            return [cast_to_int(self.mediainfo['Video']['width']),cast_to_int(self.mediainfo['Video']['height']),0,0]
         
     def create_thumbs(self):
         """ Create thumbnails for crop-rectangle analysis
@@ -268,7 +268,7 @@ class QueueElement:
         except Exception as e:
             logger.error('  crop failed with: '+e.message)
         
-        return [self.mediainfo['Video']['width'],self.mediainfo['Video']['height'],0,0]
+        return [cast_to_int(self.mediainfo['Video']['width']),cast_to_int(self.mediainfo['Video']['height']),0,0]
 
     def delete_thumbs(self):
         """ Delete created jpegs
