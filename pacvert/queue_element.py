@@ -207,7 +207,7 @@ class QueueElement:
             logger.debug("Delete transcode-file: '"+self.file_output()+"'")
             remove(self.file_output())
         except OSError as e:
-            logger.error("Can't delete transcode-file '"+self.file_output()+"'.")
+            logger.error("Can't delete transcode for '"+self.get_full_name_with_path()+"'.")
     
     def analyze_crop(self):
         """ Run the different cropping functions
