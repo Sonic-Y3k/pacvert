@@ -86,7 +86,7 @@ class QueueElement:
         Keyword arguments:
         t -- minimum seconds since last file modification
         """
-        check_query = ((time() - path.getmtime(self.get_full_name_with_path())) > t)
+        check_query = (abs(time() - path.getmtime(self.get_full_name_with_path())) > t)
         return check_query
     
     def file_check_extension(self):
