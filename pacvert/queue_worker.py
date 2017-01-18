@@ -87,6 +87,7 @@ def run():
                 for timecode in conv:
                     with pacvert.QUEUE_LOCK:
                         active.file_status_progress = timecode
+                        active.update_output_size()
                 logger.info("finished job '"+active.file_name+active.file_extension+"'")
                 with pacvert.QUEUE_LOCK:
                     pacvert.QUEUE.append('finished', pacvert.QUEUE.pop('active')) # set status to finished

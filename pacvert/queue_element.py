@@ -276,18 +276,12 @@ class QueueElement:
         """
         self.file_status_finished = cls_new_finished
     
-    def get_output_filesize(self):
+    def update_output_size(self):
         """ Returns the filesize of output
         """
-        if (self.file_status_status >= 3):
-            return self.file_output_size
-        else:
-            if path.exists(self.file_output):
-                self.file_output_size = path.getsize(self.file_output)
-                return self.file_output_size
-            else:
-                return 0
-    
+        if path.exists(self.file_output):
+            self.file_output_size = path.getsize(self.file_output)
+        
     def export_object(self):
         """ Export our file into dict
         """
@@ -304,7 +298,7 @@ class QueueElement:
             'file_status_added': self.file_status_added,
             'file_status_start': self.file_status_start,
             'file_status_finished': self.file_status_finished,
-            'file_output_size': self.get_output_filesize(),
+            'file_output_size': self.file_output_size,
             'mediainfo': self.mediainfo,
             'unique_id': self.unique_id
         }
