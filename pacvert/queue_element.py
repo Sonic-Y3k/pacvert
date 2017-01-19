@@ -303,6 +303,24 @@ class QueueElement:
             'unique_id': self.unique_id
         }
         
+    def get_track_ids(self):
+        """ Returns a list of track ids
+        """
+        result_list = []
+        if 'Video' in self.mediainfo:
+            result_list.append(self.mediainfo['Video']['track_id']-1)
+        if 'Audio' in self.mediainfo:
+            for i in self.mediainfo['Audio']:
+                result_list.append(i['track_id']-1)
+        if 'Subtitle' in self.mediainfo:
+            for i in self.mediainfo['Subtitle']:
+                result_list.append(i['track_id']-1)
+        
+        if len(result_list) == 0:
+            return 0
+            
+        return result_list
+        
     def import_object(self, cls_object_data):
         """ Import a dict and fill object accordingly
         

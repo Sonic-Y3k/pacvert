@@ -116,10 +116,14 @@ class Converter(object):
 
         if 'map' in opt:
             m = opt['map']
-            if not isinstance(m, int):
-                raise ConverterError('map needs to be int')
+            if not isinstance(m, list):
+                raise ConverterError('map needs to be list')
             else:
-                format_options.extend(['-map', str(m)])
+                for to_map in m:
+                    if not isinstance(to_map, int):
+                        raise ConverterError('elements in map list need to be int.')
+                    
+                    format_options.extend(['-map', '0:'+str(to_map)])
 
         # aggregate all options
         optlist = audio_options + video_options + subtitle_options + \

@@ -82,7 +82,7 @@ def run():
                     'subtitle': {
                         'codec': pacvert.CONFIG.DEFAULT_CODEC_SUBTITLE,
                     },
-                    'map': 0,
+                    'map': active.get_track_ids(),
                 })
                 for timecode in conv:
                     with pacvert.QUEUE_LOCK:
@@ -93,5 +93,6 @@ def run():
                     pacvert.QUEUE.append('finished', pacvert.QUEUE.pop('active')) # set status to finished
             except FFMpegConvertError as e:
                 logger.error("ffmpeg: " +e.message + " with command: "+ e.cmd)
+                logger.error('detail: '+e.output)
                 with pacvert.QUEUE_LOCK:
                     pacvert.QUEUE.append('failed', pacvert.QUEUE.pop('active')) # set status to failed
