@@ -113,8 +113,13 @@ def checkGithub():
     # Get the latest version available from github
     logger.info('Retrieving latest version information from GitHub')
     url = 'https://api.github.com/repos/%s/pacvert/commits/%s' % (pacvert.CONFIG.GIT_USER, pacvert.CONFIG.GIT_BRANCH)
+    headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
     if pacvert.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % pacvert.CONFIG.GIT_TOKEN
-    version = request.request_json(url, timeout=20, validator=lambda x: type(x) == dict)
+    
+    # test ->
+    version = request.request_json(url, timeout=20, headers=headers, validator=lambda x: type(x) == dict)
+    # <-
+    #version = request.request_json(url, timeout=20, validator=lambda x: type(x) == dict)
 
     if version is None:
         logger.warn('Could not get the latest version from GitHub. Are you running a local development version?')
