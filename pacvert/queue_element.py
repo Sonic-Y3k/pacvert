@@ -68,8 +68,7 @@ class QueueElement:
         self.mediainfo = cls_mediainfo
         track_diff = str(self.get_track_count_from_mediainfo('Video'))+'v, ' \
                     +str(self.get_track_count_from_mediainfo('Audio'))+'a, ' \
-                    +str(self.get_track_count_from_mediainfo('Subtitle'))+'s ' \
-                    +str(self.get_track_count_from_mediainfo('Text'))+'t'
+                    +str(self.get_track_count_from_mediainfo('Subtitle')+self.get_track_count_from_mediainfo('Text'))+'s'
         logger.debug('  pulled '+str(self.get_track_count_from_mediainfo())+' ('+track_diff+') tracks.')
     
     def file_check_existance(self):
@@ -178,15 +177,16 @@ class QueueElement:
         """
         counter = 0
         try:
-            for i in self.mediainfo:
-                if cls_track_type == "all":
+            if cls_track_type in self.mediainfo:                
+                if cls_track_type == 'Video':
+                    return 1
+                elif cls_track_type in ['Audio', 'Subtitle', 'Text']:
+                    return len(self.mediainfo[cls_track_type])
+            elif cls_track_type == "all":
+                for i in self.mediainfo:
                     counter += 1
-                else:
-                    if i == cls_track_type:
-                        if isinstance(i, list):
-                            counter += len(i)
-                        else:
-                            counter += 1
+            else:
+                return 0
         except Exception as e:
             logger.error(e.message)
             return 0
@@ -313,7 +313,7 @@ class QueueElement:
         if 'Audio' in self.mediainfo:
             for i in self.mediainfo['Audio']:
                 result_list.append(i['track_id']-1)
-        if 'Subtitle' in self.mediainfo['Subtitle']:
+        if 'Subtitle' in self.mediainfo:
             for i in self.mediainfo['Subtitle']:
                 result_list.append(i['Subtitle'])
         if 'Text' in self.mediainfo:
