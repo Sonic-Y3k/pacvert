@@ -68,7 +68,7 @@ class QueueElement:
         self.mediainfo = cls_mediainfo
         track_diff = str(self.get_track_count_from_mediainfo('Video'))+'v, ' \
                     +str(self.get_track_count_from_mediainfo('Audio'))+'a, ' \
-                    +str(self.get_track_count_from_mediainfo('Subtitle'))+'s' \
+                    +str(self.get_track_count_from_mediainfo('Subtitle'))+'s ' \
                     +str(self.get_track_count_from_mediainfo('Text'))+'t'
         logger.debug('  pulled '+str(self.get_track_count_from_mediainfo())+' ('+track_diff+') tracks.')
     
