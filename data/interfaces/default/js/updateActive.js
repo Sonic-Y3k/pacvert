@@ -4,6 +4,7 @@ var default_start = 0;
 var default_end = 20;
 var default_status = -1;
 var total_files = 0;
+var pause_value = 0;
 
 document.addEventListener('keyup', function (){
     if (document.getElementById("editBox").style.visibility != "hidden") {
@@ -125,6 +126,10 @@ function pullData(once = false) {
                     if (parseInt(value.commits_behind) > 0) {
                     	document.getElementById("update").style.visibility = 'visible';
                     }
+                    if (pause_value != parseInt(value.pause)) {
+                        toggle_pause(parseInt(value.pause, false));
+                    }
+                    
                     return false;
                 }
                 
@@ -228,6 +233,19 @@ function msToTime(duration) {
     seconds = (seconds < 10) ? "0" + seconds : seconds;
 
     return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+}
+
+function toggle_pause(value, update=true) {
+    var pause = document.getElementById('pause');
+    var play = document.getElementById('play');
+    
+    pause_value = value;
+    pause.style.display = pause.style.display === 'none' ? 'inline' : 'none';
+    play.style.display = play.style.display === 'none' ? 'inline' : 'none';
+    
+    if (update === true) {
+        $.get( "update", { pause: value });
+    }
 }
 
 function moveUp(id) {

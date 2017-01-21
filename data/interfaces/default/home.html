@@ -35,6 +35,8 @@ window.onload = function() {
 		<li><a href="javascript:void(0);" class="tablinks" id="view_finished" onclick="javascript:showFilter(event, 'progress', 3)">Finished</a></li>
 		<li><a href="javascript:void(0);" class="tablinks" id="view_failed" onclick="javascript:showFilter(event, 'progress', 4)">Failed</a></li>
 		<li><a href="javascript:void(0);" class="tablinks" id="view_settings" onclick="javascript:showFilter(event, 'settings', 0)"><img src="../images/settings.svg" width="20px" height="20px" alt="Settings"></a></li>
+		<li id="pause" style="display: inline"><a href="javascript:void(0);" class="tablinks" onclick="javascript:toggle_pause(1, true)"><img src="../images/pause.svg" width="20px" height="20px" alt="Pause after current"></a></li>
+		<li id="play" style="display: none;"><a href="javascript:void(0)" class="tablinks" onclick="javascript:toggle_pause(0, true)"><img src="../images/play.svg" width="20px" height="20px" alt="Resume"></a></li>
 	</ul>
 	<div id="progress" class="tabcontent">
 		<table id="table_progress">

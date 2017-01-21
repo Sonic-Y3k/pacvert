@@ -23,7 +23,7 @@ def run():
     while True:
         active = None
         with pacvert.QUEUE_LOCK:
-            if (pacvert.QUEUE.len('active') == 0) and (pacvert.QUEUE.len('pending') > 0):
+            if (pacvert.QUEUE.len('active') == 0) and (pacvert.QUEUE.len('pending') > 0) and not pacvert.PAUSE:
                 active = pacvert.QUEUE.pop('pending')
                 pacvert.QUEUE.append('active', active)
         

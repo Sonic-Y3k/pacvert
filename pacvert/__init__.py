@@ -76,6 +76,7 @@ QUEUE = ElementQueue()
 QUEUE_LOCK = threading.Lock()
 SCAN_LOCK = threading.Lock()
 TEMP = None
+PAUSE = False
 
 def initialize(config_file):
     with INIT_LOCK:
@@ -88,6 +89,7 @@ def initialize(config_file):
         global UMASK
         global POLLING_FAILOVER
         global QUEUE
+        global PAUSE
         CONFIG = pacvert.config.Config(config_file)
         CONFIG_FILE = config_file
         

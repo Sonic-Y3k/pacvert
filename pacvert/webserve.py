@@ -50,7 +50,7 @@ class WebInterface(object):
 
     ##### update home #####
     @cherrypy.expose
-    def update(self, start=None, end=None, status_filter=None, updateName=None, updateID=None, up=None, down=None, remove=None):
+    def update(self, start=None, end=None, status_filter=None, updateName=None, updateID=None, up=None, down=None, remove=None, pause=None):
         try:
             start = int(start)
             end = int(end)
@@ -59,6 +59,17 @@ class WebInterface(object):
             start = 0
             end = 20
             status_filter = -1
+        
+        if pause is not None:
+            try:
+                pause = int(pause)
+            except TypeError:
+                pause = 0
+            
+            if pause == 1:
+                pacvert.PAUSE = True
+            else:
+                pacvert.PAUSE = False
         
         if not up is None:
             try:
@@ -102,7 +113,7 @@ class WebInterface(object):
         if len(tempQueue) > 0:
             for i in range(min(start, len(tempQueue)), min(len(tempQueue),end)):
                 retValue.append(tempQueue[i].export_object())
-        retValue.append({'queue_length': len(tempQueue), 'commits_behind': pacvert.COMMITS_BEHIND})
+        retValue.append({'queue_length': len(tempQueue), 'commits_behind': pacvert.COMMITS_BEHIND, 'pause': int(pacvert.PAUSE)})
         return json.dumps(retValue)
         
     @cherrypy.expose
