@@ -152,7 +152,8 @@ function pullData(once = false) {
                 
                 var controls = "";
                 if ((value.file_status_status !== 0) && (value.file_status_status != 3)) {
-                    controls += '<div class="arrows"><a href="javascript:moveDown('+value.unique_id+')"><img src="../images/action_arrow_down.svg" class="arrow_down"></a>';
+                    controls += '<div class="arrows">';
+                    controls += '<a href="javascript:moveDown('+value.unique_id+')"><img src="../images/action_arrow_down.svg" class="arrow_down"></a>';
                     controls += '<a href="javascript:moveUp('+value.unique_id+')"><img src="../images/action_arrow_up.svg" class="arrow_up"></a></div>';
                     controls += '<div class="cls_denied"><a href="javascript:remove('+value.unique_id+')"><img src="../images/denied.svg" width="16px" height="16px" class="denied"></a></div>';
                 } else if (value.file_status_status == 3) {

@@ -149,22 +149,22 @@ h1 {
 }
 
 .arrows {
-    position: relative;
-    top: 0;
-    bottom: 0;
-    width: 26px;
-    right: 0px;
+    float: left;
+    width: 50px;
+    height: 25px;
 }
 
 .arrow_up {
     position: relative;
     top: 0;
+    left: 0px;
     cursor: pointer;
 }
 
 .arrow_down {
-    position: absolute;
+    position: relative;
     top: 5px;
+    left: 0px;
     cursor: pointer;
 }
 
@@ -175,10 +175,7 @@ h1 {
 }
 
 .cls_denied {
-    position: fixed;
-    vertical-align: middle;
-    height: 100%;
-    right: 50px;
+    margin-left: 50px;
 }
 
 .settings_footer {
