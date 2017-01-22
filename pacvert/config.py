@@ -52,6 +52,7 @@ _CONFIG_DEFINITIONS = {
     'DEFAULT_CODEC_VIDEO': (str, 'CodecSettings', 'hevc'),
     'DEFAULT_CODEC_VIDEO_CROP': (bool, 'CodecSettings', True),
     'DEFAULT_CODEC_VIDEO_CONVERT': (bool, 'CodecSettings', True),
+    'DEFAULT_PAGE_SIZE': (int, 'General', 20),
     'DO_NOT_OVERRIDE_GIT_BRANCH': (bool, 'General', False),
     'ENABLE_HTTPS': (bool, 'General', False),
     'FIRST_RUN_COMPLETE': (bool, 'General', False),

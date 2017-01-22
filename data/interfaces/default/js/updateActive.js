@@ -5,6 +5,7 @@ var default_end = 20;
 var default_status = -1;
 var total_files = 0;
 var pause_value = 0;
+var page_size = 20;
 
 document.addEventListener('keyup', function (){
     if (document.getElementById("editBox").style.visibility != "hidden") {
@@ -42,7 +43,7 @@ function showFilter(evt, settingCat, num) {
     if (settingCat == "progress") { // only do this if displaying progress window
         // Reset page selector
         default_start = 0;
-        default_end = 20;
+        default_end = page_size;
     
         // Set the filter so that the right data is pulled
         default_status = num;
@@ -58,7 +59,7 @@ function showFilter(evt, settingCat, num) {
 function firstPage() {
     // Restore default value
     default_start = 0;
-    default_end = 20;
+    default_end = page_size;
     
     // Remove all entries from table
     $("#table_progress").find("tr:gt(0)").remove();
@@ -68,10 +69,10 @@ function firstPage() {
 }
 
 function nextPage() {
-    if ((default_start+20) < total_files) {
-        // if possible increase values by 20
-        default_start += 20;
-        default_end += 20;
+    if ((default_start+page_size) < total_files) {
+        // if possible increase values by page_size
+        default_start += page_size;
+        default_end += page_size;
         
         // Remove all entries from table
         $("#table_progress").find("tr:gt(0)").remove();
@@ -82,10 +83,10 @@ function nextPage() {
 }
 
 function previousPage() {
-    if ((default_start-20) >= 0) {
-        // if possible decrease values by 20
-        default_start -= 20;
-        default_end -= 20;
+    if ((default_start-page_size) >= 0) {
+        // if possible decrease values by page_size
+        default_start -= page_size;
+        default_end -= page_size;
         
         // Remove all entries from table
         $("#table_progress").find("tr:gt(0)").remove();
@@ -96,7 +97,7 @@ function previousPage() {
 }
 
 function lastPage() {
-    while ((default_start+20) < total_files) {
+    while ((default_start+page_size) < total_files) {
         // increase by 20 unitl we are on the last possible page
         nextPage();
     }
@@ -107,6 +108,13 @@ function updateTotalFiles(count) {
     splitText[5] = count;
     document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
     total_files = count;
+}
+
+function updatePageSize(num) {
+    var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
+    splitText[3] = num;
+    document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
+    page_size = num;
 }
 
 function pullData(once = false) {
@@ -129,7 +137,7 @@ function pullData(once = false) {
                     if (pause_value != parseInt(value.pause)) {
                         toggle_pause(parseInt(value.pause, false));
                     }
-                    
+                    updatePageSize(value.page_size);
                     return false;
                 }
                 
