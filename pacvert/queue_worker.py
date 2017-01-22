@@ -45,7 +45,7 @@ def run():
                     if pacvert.CONFIG.CODEC_AVC_AUTOMAXRATE: # if automatic maxrate is enabled
                         if pacvert.CONFIG.CODEC_AVC_BUFSIZE < 0 or pacvert.CONFIG.CODEC_H264_MAXRATE < 0:
                             if  'bit_rate' in active.mediainfo['Video']:
-                                video['maxrate'] = cast_to_int(active.mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
+                                video['maxrate'] = cast_to_int(active.mediainfo['Video']['bit_rate']*0.9) # set maxrate to video track bitrate
                                 video['bufsize'] = cast_to_int(active.mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
                         else:
                             video['maxrate'] = pacvert.CONFIG.CODEC_AVC_MAXRATE # set maxrate to given value
@@ -59,7 +59,7 @@ def run():
                     if pacvert.CONFIG.CODEC_HEVC_AUTOMAXRATE: # set max rate
                         if pacvert.CONFIG.CODEC_HEVC_BUFSIZE < 0 or pacvert.CONFIG.CODEC_HEVC_MAXRATE < 0:
                             if  'bit_rate' in active.mediainfo['Video']:
-                                video['maxrate'] = cast_to_int(active.mediainfo['Video']['bit_rate']) # set maxrate to video track bitrate
+                                video['maxrate'] = cast_to_int(active.mediainfo['Video']['bit_rate']*0.9) # set maxrate to video track bitrate
                                 video['bufsize'] = cast_to_int(active.mediainfo['Video']['bit_rate']*3) # set bufsize to three times the video bitrate
                         else:
                             video['maxrate'] = pacvert.CONFIG.CODEC_HEVC_MAXRATE # set maxrate to given value
