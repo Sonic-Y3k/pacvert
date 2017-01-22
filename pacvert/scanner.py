@@ -14,6 +14,7 @@ def scan():
     try:
         with pacvert.SCAN_LOCK:
             for root, directories, filenames in walk(pacvert.CONFIG.SCAN_DIRECTORIES_PATH):
+                directories.sort()
                 for filename in sorted(filenames):
                     full_path = path.join(root,filename)
                     if full_path not in pacvert.IGNORE_QUEUE:
