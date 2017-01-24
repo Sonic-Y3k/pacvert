@@ -231,6 +231,9 @@ def initialize_scheduler():
             seconds = 0
         schedule_job(scanner.scan, 'Scan directories for new files', hours=0, minutes=0, seconds=seconds)
 
+        # Clean ignore list
+        schedule_job(helpers.clean_ignore_list, 'Clean ignore list', hours=0, minutes=10, seconds=0)
+
         #Update queue
         #schedule_job(helpers.sortQueue, 'Resort queue', hours=0, minutes=0, seconds=10)
         

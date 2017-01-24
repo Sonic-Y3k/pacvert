@@ -697,6 +697,17 @@ def returnQueueElementByFileID(fileid):
         
     return None
     
+def clean_ignore_list():
+    """ Removes objects that doesn't exist anymore from list
+    """
+    old_length = len(pacvert.IGNORE_QUEUE)
+    if len(pacvert.IGNORE_QUEUE) > 0:
+        for element in pacvert.IGNORE_QUEUE:
+            if (os.path.exists(element) == False):
+                pacvert.IGNORE_QUEUE.remove(element)
+    new_length = len(pacvert.IGNORE_QUEUE)
+    logger.debug('finished cleaning ignore list (length: '+str(new_length)+', diff: '+str(new_length-old_length)+')')
+    
 def aspectMod(w,h):
     """
     Workaround:
