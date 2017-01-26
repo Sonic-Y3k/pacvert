@@ -14,7 +14,7 @@ import datetime
 #except ImportError:
 #    no_browser = True
 
-#import cherrypy
+import cherrypy
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
@@ -274,7 +274,7 @@ def sig_handler(signum=None, frame=None):
         shutdown()
 
 def shutdown(restart=False, update=False):
-    #cherrypy.engine.exit()
+    cherrypy.engine.exit()
     SCHED.shutdown(wait=False)
 
     CONFIG.write()
