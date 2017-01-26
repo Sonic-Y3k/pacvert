@@ -61,6 +61,8 @@ function firstPage() {
     default_start = 0;
     default_end = page_size;
     
+    updateCurrentFileRange();
+    
     // Remove all entries from table
     $("#table_progress").find("tr:gt(0)").remove();
         
@@ -73,6 +75,8 @@ function nextPage() {
         // if possible increase values by page_size
         default_start += page_size;
         default_end += page_size;
+        
+        updateCurrentFileRange();
         
         // Remove all entries from table
         $("#table_progress").find("tr:gt(0)").remove();
@@ -87,6 +91,8 @@ function previousPage() {
         // if possible decrease values by page_size
         default_start -= page_size;
         default_end -= page_size;
+        
+        updateCurrentFileRange();
         
         // Remove all entries from table
         $("#table_progress").find("tr:gt(0)").remove();
@@ -103,6 +109,13 @@ function lastPage() {
     }
 }
 
+function updateCurrentFileRange() {
+    var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
+    splitText[2] = default_start;
+    splitText[4] = default_end;
+    document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
+}
+
 function updateTotalFiles(count) {
     var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
     splitText[5] = count;
@@ -115,12 +128,13 @@ function updatePageSize(num) {
     splitText[3] = num;
     document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
     page_size = num;
+    firstPage();
 }
 
 function pullData(once = false) {
     $.get("update", {
         start: default_start,
-        end: (page_size != default_end) ? page_size : default_end,
+        end: default_end,
         status_filter: default_status
     }).done(function (data) {
         var parsedData = JSON.parse(data);
@@ -142,7 +156,7 @@ function pullData(once = false) {
                     }
                     return true;
                 }
-                if (rowCounter > page_size) {
+                if (rowCounter >= page_size) {
                     return false;
                 }
                 var fullpath = value.file_path+'/'+value.file_name+value.file_extension;
