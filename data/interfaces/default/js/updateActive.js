@@ -115,6 +115,9 @@ function updatePageSize(num) {
     splitText[3] = num;
     document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
     page_size = num;
+    
+    // Remove all entries from table
+    $("#table_progress").find("tr:gt(0)").remove();
 }
 
 function pullData(once = false) {
@@ -137,7 +140,9 @@ function pullData(once = false) {
                     if (pause_value != parseInt(value.pause)) {
                         toggle_pause(parseInt(value.pause, false));
                     }
-                    updatePageSize(value.page_size);
+                    if (page_size != value.page_size) {
+                        updatePageSize(value.page_size);
+                    }
                     return false;
                 }
                 
