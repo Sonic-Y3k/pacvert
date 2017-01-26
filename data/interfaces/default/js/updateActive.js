@@ -140,11 +140,10 @@ function pullData(once = false) {
                     if (page_size != value.page_size) {
                         updatePageSize(value.page_size);
                     }
-                    return false;
+                    return true;
                 }
                 if (rowCounter > page_size) {
-                    // Remove all entries from table
-                    $("#table_progress").find("tr:gt(0)").remove();
+                    return false;
                 }
                 var fullpath = value.file_path+'/'+value.file_name+value.file_extension;
                 fullpath = (fullpath.length > 60) ? '...'+fullpath.slice(Math.max(0,fullpath.length-60),fullpath.length) : fullpath;
