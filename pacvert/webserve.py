@@ -110,10 +110,10 @@ class WebInterface(object):
         with pacvert.QUEUE_LOCK:
             tempQueue = pacvert.QUEUE.get_all(status_filter)
         
+        retValue.append({'queue_length': len(tempQueue), 'commits_behind': pacvert.COMMITS_BEHIND, 'pause': int(pacvert.PAUSE), 'page_size': int(pacvert.CONFIG.DEFAULT_PAGE_SIZE)})
         if len(tempQueue) > 0:
             for i in range(min(start, len(tempQueue)), min(len(tempQueue),end)):
                 retValue.append(tempQueue[i].export_object())
-        retValue.append({'queue_length': len(tempQueue), 'commits_behind': pacvert.COMMITS_BEHIND, 'pause': int(pacvert.PAUSE), 'page_size': int(pacvert.CONFIG.DEFAULT_PAGE_SIZE)})
         return json.dumps(retValue)
         
     @cherrypy.expose
