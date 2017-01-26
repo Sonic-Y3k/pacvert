@@ -308,17 +308,16 @@ class QueueElement:
         """ Returns a list of track ids
         """
         result_list = []
-        if 'Video' in self.mediainfo:
-            result_list.append(self.mediainfo['Video']['track_id']-1)
-        if 'Audio' in self.mediainfo:
-            for i in self.mediainfo['Audio']:
-                result_list.append(i['track_id']-1)
-        if 'Subtitle' in self.mediainfo:
-            for i in self.mediainfo['Subtitle']:
-                result_list.append(i['track_id']-1)
-        if 'Text' in self.mediainfo:
-            for i in self.mediainfo['Text']:
-                result_list.append(i['track_id']-1)
+        
+        for name, category in self.mediainfo.items():
+            if name == 'Video':
+                result_list.insert(0, int(category['streamorder']))
+            elif name == 'Audio':
+                for entry in category:
+                    result_list.insert(1, int(entry['streamorder']))
+            elif name in ['Subtitle', 'Text']:
+                for entry in category:
+                    result_list.append(int(entry['streamorder']))
         
         if len(result_list) == 0:
             return 0
