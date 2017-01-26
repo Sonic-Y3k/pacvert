@@ -315,7 +315,7 @@ class QueueElement:
                 result_list.append(i['track_id']-1)
         if 'Subtitle' in self.mediainfo:
             for i in self.mediainfo['Subtitle']:
-                result_list.append(i['Subtitle'])
+                result_list.append(i['track_id']-1)
         if 'Text' in self.mediainfo:
             for i in self.mediainfo['Text']:
                 result_list.append(i['track_id']-1)
