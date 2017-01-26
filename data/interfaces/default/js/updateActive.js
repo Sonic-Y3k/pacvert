@@ -111,8 +111,8 @@ function lastPage() {
 
 function updateCurrentFileRange() {
     var splitText = document.getElementById("page_selector_text").innerHTML.split(" ");
-    splitText[2] = default_start;
-    splitText[4] = default_end;
+    splitText[1] = default_start;
+    splitText[3] = default_end;
     document.getElementById("page_selector_text").innerHTML = splitText.join(" ");
 }
 
